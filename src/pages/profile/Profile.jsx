@@ -18,7 +18,7 @@ import {
 
 import BottomNavigation from "../../components/home/BottomNavigation";
 import { useLanguage } from "../../context/LanguageContext.jsx";
-import "../../styles/Profile.css";
+import "../../styles/profile.css";
 
 const DEFAULT_USER = {
   fullName: "أحمد محمد",
