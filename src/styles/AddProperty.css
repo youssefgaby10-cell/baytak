@@ -1,0 +1,1050 @@
+
+/* =========================================
+   AddProperty.css
+   Responsive + RTL/LTR + Dark Mode
+   ========================================= */
+
+/* ---------- 1. Theme variables ---------- */
+
+.add-property-page {
+  --ap-bg: #f5f7fb;
+  --ap-surface: #ffffff;
+  --ap-surface-soft: #f8fafc;
+  --ap-text: #172033;
+  --ap-text-secondary: #64748b;
+  --ap-border: #e2e8f0;
+  --ap-primary: #2563eb;
+  --ap-primary-hover: #1d4ed8;
+  --ap-primary-soft: #eff6ff;
+  --ap-success: #16a34a;
+  --ap-danger: #dc2626;
+  --ap-danger-soft: #fef2f2;
+  --ap-shadow: 0 8px 30px rgb(15 23 42 / 6%);
+  --ap-radius: 18px;
+  --ap-input-bg: #ffffff;
+
+  direction: inherit;
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px 20px 48px;
+  background: var(--ap-bg);
+  color: var(--ap-text);
+  font-family: inherit;
+  box-sizing: border-box;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.add-property-page *,
+.add-property-page *::before,
+.add-property-page *::after {
+  box-sizing: border-box;
+}
+
+.add-property-page button,
+.add-property-page input,
+.add-property-page select,
+.add-property-page textarea {
+  font: inherit;
+}
+
+.add-property-page button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.add-property-page img {
+  max-width: 100%;
+}
+
+/* ---------- 2. Dark mode ---------- */
+
+/* Supports common application theme selectors. */
+
+html.dark .add-property-page,
+body.dark .add-property-page,
+.dark .add-property-page,
+[data-theme="dark"] .add-property-page,
+.add-property-page[data-theme="dark"] {
+  --ap-bg: #0b1120;
+  --ap-surface: #151e30;
+  --ap-surface-soft: #1b263a;
+  --ap-text: #f1f5f9;
+  --ap-text-secondary: #a3b1c6;
+  --ap-border: #334155;
+  --ap-primary: #60a5fa;
+  --ap-primary-hover: #93c5fd;
+  --ap-primary-soft: #172d4b;
+  --ap-success: #4ade80;
+  --ap-danger: #f87171;
+  --ap-danger-soft: #3b1d2a;
+  --ap-shadow: 0 8px 30px rgb(0 0 0 / 20%);
+  --ap-input-bg: #111a2b;
+}
+
+/* ---------- 3. Main container ---------- */
+
+.add-property-container {
+  width: 100%;
+  max-width: 1080px;
+  margin-inline: auto;
+}
+
+/* ---------- 4. Page header ---------- */
+
+.add-property-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.back-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.back-button:hover {
+  background: var(--ap-surface-soft);
+  border-color: var(--ap-primary);
+  transform: translateY(-1px);
+}
+
+.back-button:focus-visible,
+.add-property-page button:focus-visible {
+  outline: 3px solid rgb(37 99 235 / 25%);
+  outline-offset: 3px;
+}
+
+.header-title {
+  min-width: 0;
+  margin: 0;
+  color: var(--ap-text);
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 800;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+  font-size: 1.4rem;
+}
+
+/* ---------- 5. Main form ---------- */
+
+.add-property-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 100%;
+}
+
+.property-section {
+  min-width: 0;
+  padding: 26px;
+  border: 1px solid var(--ap-border);
+  border-radius: var(--ap-radius);
+  background: var(--ap-surface);
+  box-shadow: var(--ap-shadow);
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 24px;
+  color: var(--ap-text);
+  font-size: 1.2rem;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.section-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+/* ---------- 6. Image upload section ---------- */
+
+.images-area {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.upload-main-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 190px;
+  padding: 28px 20px;
+  border: 2px dashed var(--ap-border);
+  border-radius: 16px;
+  background: var(--ap-surface-soft);
+  color: var(--ap-text-secondary);
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.upload-main-card:hover {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+}
+
+.upload-main-card svg {
+  color: var(--ap-primary);
+  font-size: 2rem;
+}
+
+.upload-main-card h3,
+.upload-main-card p {
+  margin: 0;
+}
+
+.upload-main-card h3 {
+  color: var(--ap-text);
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.upload-main-card p {
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.images-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.image-card {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+}
+
+.image-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.main-badge {
+  position: absolute;
+  inset-block-start: 9px;
+  inset-inline-start: 9px;
+  z-index: 1;
+  max-width: calc(100% - 18px);
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--ap-primary);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.image-actions {
+  position: absolute;
+  inset-inline: 8px;
+  inset-block-end: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.image-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: rgb(15 23 42 / 82%);
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.image-actions button:hover {
+  background: #dc2626;
+}
+
+.add-more-image {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  padding: 12px;
+  border: 2px dashed var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+  color: var(--ap-text-secondary);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.add-more-image:hover {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+}
+
+.add-more-image svg {
+  font-size: 1.6rem;
+}
+
+.add-more-image span {
+  font-size: 0.85rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+/* ---------- 7. Sale / rent switch ---------- */
+
+.operation-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 6px;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+}
+
+.operation-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ap-text-secondary);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.operation-switch button.active {
+  border-color: var(--ap-border);
+  background: var(--ap-surface);
+  color: var(--ap-primary);
+  box-shadow: 0 2px 8px rgb(15 23 42 / 6%);
+}
+
+/* ---------- 8. Form fields ---------- */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  color: var(--ap-text);
+  font-size: 0.94rem;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.form-group label .required,
+.form-group .required {
+  color: var(--ap-danger);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid var(--ap-border);
+  border-radius: 12px;
+  outline: none;
+  background: var(--ap-input-bg);
+  color: var(--ap-text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--ap-text-secondary);
+  opacity: 0.8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--ap-primary);
+  box-shadow: 0 0 0 3px rgb(37 99 235 / 12%);
+}
+
+.form-group input:disabled,
+.form-group select:disabled,
+.form-group textarea:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.form-group textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.form-group input[type="number"] {
+  direction: ltr;
+  text-align: start;
+}
+
+.form-group input[type="checkbox"],
+.form-group input[type="radio"] {
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  padding: 0;
+  accent-color: var(--ap-primary);
+  box-shadow: none;
+}
+
+.form-group input[type="file"] {
+  min-height: auto;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 20px;
+  row-gap: 0;
+}
+
+.form-grid .form-group {
+  margin-bottom: 20px;
+}
+
+.form-grid .form-group.full-width,
+.form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+/* ---------- 9. Location section ---------- */
+
+.location-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.location-highlight {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 16px;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+}
+
+.location-highlight svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--ap-primary);
+  font-size: 1.3rem;
+}
+
+.location-highlight h3,
+.location-highlight p {
+  margin: 0;
+}
+
+.location-highlight h3 {
+  margin-bottom: 5px;
+  color: var(--ap-text);
+  font-size: 0.98rem;
+  font-weight: 750;
+}
+
+.location-highlight p {
+  color: var(--ap-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.map-location-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+}
+
+.selected-map-location {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid var(--ap-border);
+  border-radius: 11px;
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  overflow-wrap: anywhere;
+}
+
+.selected-map-location svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: var(--ap-success);
+}
+
+.maps-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--ap-primary);
+  border-radius: 12px;
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.maps-button:hover {
+  background: var(--ap-primary);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.maps-button svg {
+  flex: 0 0 auto;
+  font-size: 1.1rem;
+}
+
+/* ---------- 10. Property details ---------- */
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.details-grid > * {
+  min-width: 0;
+}
+
+.counter-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--ap-border);
+  border-radius: 14px;
+  background: var(--ap-surface-soft);
+}
+
+.counter-box label,
+.counter-box .counter-label {
+  color: var(--ap-text);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.counter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+.counter button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--ap-border);
+  border-radius: 11px;
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.counter button:hover {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+  color: var(--ap-primary);
+}
+
+.counter button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.counter span {
+  min-width: 24px;
+  color: var(--ap-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 11. Amenities ---------- */
+
+.amenities-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.amenity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid var(--ap-border);
+  border-radius: 12px;
+  background: var(--ap-surface);
+  color: var(--ap-text);
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.amenity:hover {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+}
+
+.amenity:has(input:checked) {
+  border-color: var(--ap-primary);
+  background: var(--ap-primary-soft);
+}
+
+.amenity input,
+.amenity-check {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--ap-primary);
+}
+
+.amenity span {
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* ---------- 12. Submit / cancel ---------- */
+
+.submit-area {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.save-property-button,
+.cancel-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 50px;
+  padding: 13px 24px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 0.96rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.save-property-button {
+  min-width: 180px;
+  background: var(--ap-primary);
+  color: #ffffff;
+}
+
+.save-property-button:hover {
+  background: var(--ap-primary-hover);
+  transform: translateY(-1px);
+}
+
+.cancel-button {
+  border-color: var(--ap-border);
+  background: var(--ap-surface);
+  color: var(--ap-text);
+}
+
+.cancel-button:hover {
+  border-color: var(--ap-danger);
+  background: var(--ap-danger-soft);
+  color: var(--ap-danger);
+}
+
+.save-property-button:disabled,
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---------- 13. Validation messages ---------- */
+
+.error-message {
+  display: block;
+  margin-top: 3px;
+  color: var(--ap-danger);
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.form-group input[aria-invalid="true"],
+.form-group select[aria-invalid="true"],
+.form-group textarea[aria-invalid="true"] {
+  border-color: var(--ap-danger);
+}
+
+.form-group input[aria-invalid="true"]:focus,
+.form-group select[aria-invalid="true"]:focus,
+.form-group textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgb(220 38 38 / 12%);
+}
+
+/* ---------- 14. RTL / LTR support ---------- */
+
+.add-property-page[dir="rtl"] {
+  direction: rtl;
+}
+
+.add-property-page[dir="ltr"] {
+  direction: ltr;
+}
+
+.add-property-page[dir="rtl"] .section-heading,
+.add-property-page[dir="ltr"] .section-heading {
+  text-align: start;
+}
+
+.add-property-page[dir="rtl"] .form-group,
+.add-property-page[dir="ltr"] .form-group {
+  text-align: start;
+}
+
+/* Keep numbers, coordinates, and prices readable in both directions. */
+
+.add-property-page input[type="number"],
+.add-property-page input[inputmode="decimal"],
+.add-property-page input[inputmode="numeric"] {
+  unicode-bidi: plaintext;
+}
+
+/* ---------- 15. Tablet ---------- */
+
+@media (max-width: 900px) {
+  .add-property-page {
+    padding: 26px 16px 40px;
+  }
+
+  .property-section {
+    padding: 22px;
+  }
+
+  .details-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .amenities-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .images-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* ---------- 16. Mobile ---------- */
+
+@media (max-width: 600px) {
+  .add-property-page {
+    min-height: 100vh;
+    padding: 18px 12px 30px;
+  }
+
+  .add-property-header {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .back-button {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .header-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+  }
+
+  .header-title {
+    font-size: 1.35rem;
+  }
+
+  .add-property-form {
+    gap: 16px;
+  }
+
+  .property-section {
+    padding: 17px 14px;
+    border-radius: 15px;
+  }
+
+  .section-heading {
+    gap: 10px;
+    margin-bottom: 19px;
+    font-size: 1.05rem;
+  }
+
+  .section-number {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    font-size: 0.85rem;
+  }
+
+  .form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .form-grid .form-group {
+    margin-bottom: 17px;
+  }
+
+  .details-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .amenities-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .amenity {
+    gap: 8px;
+    min-height: 46px;
+    padding: 10px;
+  }
+
+  .amenity span {
+    font-size: 0.83rem;
+  }
+
+  .images-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .upload-main-card {
+    min-height: 155px;
+    padding: 22px 14px;
+  }
+
+  .image-actions {
+    inset-inline: 6px;
+    inset-block-end: 6px;
+  }
+
+  .image-actions button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .operation-switch button {
+    min-height: 44px;
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .map-location-section {
+    padding: 13px;
+  }
+
+  .location-highlight {
+    padding: 13px;
+  }
+
+  .submit-area {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .save-property-button,
+  .cancel-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+  }
+}
+
+/* ---------- 17. Small phones ---------- */
+
+@media (max-width: 360px) {
+  .add-property-page {
+    padding-inline: 9px;
+  }
+
+  .property-section {
+    padding: 14px 11px;
+  }
+
+  .header-title {
+    font-size: 1.15rem;
+  }
+
+  .section-heading {
+    font-size: 0.98rem;
+  }
+
+  .amenities-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .counter {
+    gap: 7px;
+  }
+
+  .counter button {
+    width: 34px;
+    height: 34px;
+  }
+}
+
+/* ---------- 18. Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .add-property-page,
+  .add-property-page *,
+  .add-property-page *::before,
+  .add-property-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,508 @@
+.settings-page {
+  min-height: 100vh;
+  padding: 20px;
+  background: #f8f7ff;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+.settings-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 65px;
+  margin-bottom: 25px;
+}
+
+.settings-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #202124;
+}
+
+.settings-back-btn {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border: none;
+  background: transparent;
+  color: #075bd5;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-profile-image {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.settings-profile-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.settings-section {
+  margin-bottom: 35px;
+}
+
+.settings-section h2 {
+  margin: 0 0 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #cbd5e1;
+  color: #075bd5;
+  font-size: 24px;
+  font-weight: 600;
+}
+.settings-item {
+  width: 100%;
+  min-height: 62px;
+  padding: 15px 18px;
+  margin-bottom: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid #e4e7ec;
+  border-radius: 14px;
+
+  background: #ffffff;
+  color: #202124;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+.settings-item:hover {
+  background: #f5f8ff;
+  border-color: #c9d9f5;
+}
+
+.settings-item > span:first-child {
+  text-align: right;
+}
+
+.settings-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #075bd5;
+}
+
+.settings-item-left > svg {
+  font-size: 18px;
+}
+
+.settings-item-left > span:last-child {
+  font-size: 25px;
+  line-height: 1;
+  color: #8a94a6;
+}
+
+.settings-value {
+  color: #667085;
+  font-size: 14px;
+}
+
+.settings-switch {
+  width: 42px;
+  height: 24px;
+  padding: 3px;
+
+  display: flex;
+  align-items: center;
+
+  border-radius: 20px;
+  background: #d0d5dd;
+
+  box-sizing: border-box;
+  transition: 0.25s ease;
+}
+
+.settings-switch span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+
+  display: block;
+  transition: 0.25s ease;
+}
+
+.settings-switch.active {
+  justify-content: flex-start;
+  background: #075bd5;
+}
+
+.settings-switch.active span {
+  transform: translateX(-18px);
+}
+.logout-btn {
+  width: 100%;
+  min-height: 58px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 10px;
+  margin-bottom: 30px;
+
+  border: none;
+  border-radius: 14px;
+
+  background: #fff1f1;
+  color: #e53935;
+
+  font-size: 17px;
+  font-weight: 700;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #ffe1e1;
+  transform: translateY(-1px);
+}
+
+.logout-btn svg {
+  font-size: 19px;
+}
+.settings-section:last-of-type {
+  margin-bottom: 25px;
+}
+@media (max-width: 768px) {
+
+  .settings-page {
+    padding: 15px;
+  }
+
+  .settings-header {
+    min-height: 58px;
+    margin-bottom: 20px;
+  }
+
+  .settings-header h1 {
+    font-size: 24px;
+  }
+
+  .settings-back-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  .settings-profile-image {
+    width: 44px;
+    height: 44px;
+  }
+
+  .settings-section {
+    margin-bottom: 28px;
+  }
+
+  .settings-section h2 {
+    font-size: 21px;
+    margin-bottom: 12px;
+  }
+
+  .settings-item {
+    min-height: 58px;
+    padding: 13px 15px;
+    font-size: 15px;
+    border-radius: 12px;
+  }
+
+  .settings-item-left {
+    gap: 9px;
+  }
+
+  .settings-item-left > svg {
+    font-size: 17px;
+  }
+
+  .settings-value {
+    font-size: 13px;
+  }
+
+  .logout-btn {
+    min-height: 55px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .settings-page {
+    padding: 12px;
+  }
+
+  .settings-header h1 {
+    font-size: 22px;
+  }
+
+  .settings-profile-image {
+    width: 40px;
+    height: 40px;
+  }
+
+  .settings-back-btn {
+    font-size: 18px;
+  }
+
+  .settings-section h2 {
+    font-size: 19px;
+  }
+
+  .settings-item {
+    min-height: 54px;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .settings-item-left {
+    gap: 7px;
+  }
+
+  .settings-switch {
+    width: 39px;
+    height: 23px;
+  }
+
+  .settings-switch span {
+    width: 17px;
+    height: 17px;
+  }
+
+  .settings-switch.active span {
+    transform: translateX(-16px);
+  }
+}
+/* =========================
+   DARK MODE
+========================= */
+
+[data-theme="dark"] .settings-page {
+  background: #121212;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .settings-header {
+  border-bottom-color: #2a2a2a;
+}
+
+[data-theme="dark"] .settings-header h1 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .settings-back-btn {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .settings-section h2 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .settings-item {
+  background: #1e1e1e;
+  border-color: #2a2a2a;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .settings-item:hover {
+  background: #252525;
+}
+
+[data-theme="dark"] .settings-item-left {
+  color: #bfc3cc;
+}
+
+[data-theme="dark"] .settings-value {
+  color: #bfc3cc;
+}
+
+[data-theme="dark"] .logout-btn {
+  background: #1e1e1e;
+  border-color: #3a3a3a;
+  color: #ff5c5c;
+}
+.settings-profile-image {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  background: #e7edff;
+  color: #075bd5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+
+  font-size: 22px;
+}
+[data-theme="dark"] .settings-profile-image {
+  background: #1e2a44;
+  color: #6ea8ff;
+  border-color: #2a2a2a;
+}
+/* =========================
+   PROFILE IMAGE
+========================= */
+
+.settings-profile-image {
+  position: absolute;
+  left: 0;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  background: #e7edff;
+  color: #075bd5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #ffffff;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.12);
+
+  font-size: 22px;
+}
+
+
+/* الصورة الحقيقية */
+
+.settings-profile-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+
+/* =========================
+   DARK MODE - SETTINGS
+========================= */
+
+html[data-theme="dark"] .settings-page,
+html.dark-mode .settings-page {
+  background: #121826;
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .settings-header h1,
+html.dark-mode .settings-header h1 {
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .settings-back-btn,
+html.dark-mode .settings-back-btn {
+  color: #8db4ff;
+}
+
+html[data-theme="dark"] .settings-section h2,
+html.dark-mode .settings-section h2 {
+  color: #8db4ff;
+  border-bottom-color: #37445a;
+}
+
+html[data-theme="dark"] .settings-item,
+html.dark-mode .settings-item {
+  background: #1b2536;
+  border-color: #37445a;
+  color: #f1f5f9;
+}
+
+html[data-theme="dark"] .settings-item:hover,
+html.dark-mode .settings-item:hover {
+  background: #253249;
+  border-color: #4b6590;
+}
+
+html[data-theme="dark"] .settings-item-left,
+html.dark-mode .settings-item-left {
+  color: #8db4ff;
+}
+
+html[data-theme="dark"] .settings-item-left > span:last-child,
+html.dark-mode .settings-item-left > span:last-child,
+html[data-theme="dark"] .settings-value,
+html.dark-mode .settings-value {
+  color: #b8c4d8;
+}
+
+html[data-theme="dark"] .settings-switch,
+html.dark-mode .settings-switch {
+  background: #475569;
+}
+
+html[data-theme="dark"] .settings-switch.active,
+html.dark-mode .settings-switch.active {
+  background: #3976f6;
+}
+
+html[data-theme="dark"] .settings-profile-image,
+html.dark-mode .settings-profile-image {
+  background: #253652;
+  color: #a9c7ff;
+  border-color: #37445a;
+}
+
+html[data-theme="dark"] .logout-btn,
+html.dark-mode .logout-btn {
+  background: #38232b;
+  color: #ff9ca8;
+}
+
+html[data-theme="dark"] .logout-btn:hover,
+html.dark-mode .logout-btn:hover {
+  background: #4a2933;
+}

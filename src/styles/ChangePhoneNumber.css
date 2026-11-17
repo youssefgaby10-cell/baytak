@@ -1,0 +1,525 @@
+.change-phone-page {
+  min-height: 100vh;
+
+  padding: 0 22px 30px;
+
+  background: #f9f8ff;
+  color: #202124;
+
+  direction: rtl;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+/* =========================
+   Header
+========================= */
+
+.change-phone-header {
+  position: relative;
+
+  height: 65px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 -22px 30px;
+
+  border-bottom: 1px solid #e8e7ef;
+
+  transition:
+    border-color 0.25s ease;
+}
+
+.change-phone-header h1 {
+  margin: 0;
+
+  color: #202124;
+
+  font-size: 21px;
+  font-weight: 600;
+
+  transition: color 0.25s ease;
+}
+
+.change-phone-back-btn {
+  position: absolute;
+
+  right: 20px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+
+  background: transparent;
+
+  color: #202124;
+
+  font-size: 19px;
+
+  cursor: pointer;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   Icon
+========================= */
+
+.change-phone-icon {
+  width: 80px;
+  height: 80px;
+
+  margin: 0 auto 22px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #e9eeff;
+
+  color: #075bd5;
+
+  font-size: 36px;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+/* =========================
+   Description
+========================= */
+
+.change-phone-description {
+  max-width: 390px;
+
+  margin: 0 auto 32px;
+
+  text-align: center;
+
+  color: #7b8193;
+
+  font-size: 15px;
+
+  line-height: 1.8;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   Form
+========================= */
+
+.phone-form-group {
+  margin-bottom: 24px;
+}
+
+.phone-form-group label {
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: #343746;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   Input
+========================= */
+
+.phone-input-wrapper {
+  position: relative;
+
+  width: 100%;
+}
+
+.phone-input-wrapper input {
+  width: 100%;
+  height: 56px;
+
+  padding: 0 18px 0 48px;
+
+  border: none;
+  border-radius: 13px;
+
+  outline: none;
+
+  background: #f1f2fb;
+
+  color: #202124;
+
+  font-family: inherit;
+  font-size: 16px;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.2s ease;
+}
+
+.phone-input-wrapper input::placeholder {
+  color: #b4bacb;
+}
+
+.phone-input-wrapper input:focus {
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 2px
+    rgba(7, 91, 213, 0.15);
+}
+
+.phone-input-wrapper input[readonly] {
+  cursor: default;
+  opacity: 0.9;
+}
+
+.phone-input-wrapper svg {
+  position: absolute;
+
+  left: 17px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #73798b;
+
+  font-size: 17px;
+
+  pointer-events: none;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   Info
+========================= */
+
+.phone-info {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-top: 7px;
+
+  color: #858b9d;
+
+  font-size: 12px;
+
+  transition: color 0.25s ease;
+}
+
+.phone-info svg {
+  color: #777d8f;
+
+  font-size: 12px;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   Error
+========================= */
+
+.change-phone-error {
+  margin-top: 8px;
+
+  color: #d92d20;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  line-height: 1.6;
+}
+
+/* =========================
+   Buttons
+========================= */
+
+.change-phone-actions {
+  margin-top: 28px;
+}
+
+.save-phone-btn {
+  width: 100%;
+  height: 56px;
+
+  border: none;
+  border-radius: 13px;
+
+  background: #075bd5;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.save-phone-btn:hover {
+  background: #004bb8;
+}
+
+.save-phone-btn:active {
+  transform: scale(0.99);
+}
+
+.cancel-phone-btn {
+  width: 100%;
+  height: 56px;
+
+  margin-top: 14px;
+
+  border: 2px solid #c5c9d8;
+  border-radius: 13px;
+
+  background: transparent;
+
+  color: #343746;
+
+  font-family: inherit;
+
+  font-size: 16px;
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cancel-phone-btn:hover {
+  background: #f0f1f7;
+}
+
+/* =========================
+   Privacy
+========================= */
+
+.phone-privacy {
+  margin-top: 48px;
+
+  padding-bottom: 20px;
+}
+
+.privacy-title {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+
+  color: #343746;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: color 0.25s ease;
+}
+
+.privacy-title svg {
+  color: #667085;
+
+  font-size: 18px;
+
+  transition: color 0.25s ease;
+}
+
+.phone-privacy p {
+  margin: 0;
+
+  color: #666d7e;
+
+  font-size: 14px;
+
+  line-height: 1.9;
+
+  text-align: right;
+
+  transition: color 0.25s ease;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+[data-theme="dark"] .change-phone-page {
+  background: #10131a;
+  color: #f5f7fb;
+}
+
+[data-theme="dark"] .change-phone-header {
+  border-bottom-color: #292f3a;
+}
+
+[data-theme="dark"] .change-phone-header h1 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .change-phone-back-btn {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .change-phone-icon {
+  background: #202a40;
+  color: #6f9aff;
+}
+
+[data-theme="dark"] .change-phone-description {
+  color: #aeb6c5;
+}
+
+[data-theme="dark"] .phone-form-group label {
+  color: #e6e9ef;
+}
+
+[data-theme="dark"] .phone-input-wrapper input {
+  background: #1b2029;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .phone-input-wrapper input::placeholder {
+  color: #858e9e;
+}
+
+[data-theme="dark"] .phone-input-wrapper input:focus {
+  background: #202630;
+
+  box-shadow:
+    0 0 0 2px
+    rgba(93, 136, 255, 0.2);
+}
+
+[data-theme="dark"] .phone-input-wrapper input[readonly] {
+  background: #202530;
+  color: #c8ced9;
+}
+
+[data-theme="dark"] .phone-input-wrapper svg {
+  color: #aeb6c5;
+}
+
+[data-theme="dark"] .phone-info {
+  color: #929bab;
+}
+
+[data-theme="dark"] .phone-info svg {
+  color: #9aa3b3;
+}
+
+[data-theme="dark"] .cancel-phone-btn {
+  background: #1b2029;
+
+  border-color: #3a414e;
+
+  color: #ffffff;
+}
+
+[data-theme="dark"] .cancel-phone-btn:hover {
+  background: #252b35;
+}
+
+[data-theme="dark"] .privacy-title {
+  color: #e6e9ef;
+}
+
+[data-theme="dark"] .privacy-title svg {
+  color: #aeb6c5;
+}
+
+[data-theme="dark"] .phone-privacy p {
+  color: #aeb6c5;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+  .change-phone-page {
+    padding: 0 18px 25px;
+  }
+
+  .change-phone-header {
+    margin-left: -18px;
+    margin-right: -18px;
+
+    margin-bottom: 27px;
+  }
+
+  .change-phone-header h1 {
+    font-size: 20px;
+  }
+
+  .change-phone-back-btn {
+    right: 16px;
+  }
+
+  .change-phone-icon {
+    width: 76px;
+    height: 76px;
+
+    font-size: 33px;
+  }
+
+  .change-phone-description {
+    font-size: 14px;
+
+    margin-bottom: 28px;
+  }
+
+  .phone-form-group label {
+    font-size: 14px;
+  }
+
+  .phone-input-wrapper input {
+    height: 54px;
+
+    font-size: 15px;
+  }
+
+  .phone-info {
+    font-size: 11px;
+  }
+
+  .phone-privacy {
+    margin-top: 40px;
+  }
+
+  .phone-privacy p {
+    font-size: 13px;
+  }
+}

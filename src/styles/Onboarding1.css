@@ -1,0 +1,200 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Cairo", sans-serif;
+  background: #f5f5f5;
+}
+
+.onboarding {
+  --onboarding-bg: #ffffff;
+  --onboarding-text: #111827;
+  --onboarding-muted: #555555;
+  --onboarding-border: #d8d8d8;
+  --onboarding-dot: #d8d8d8;
+  --onboarding-primary: #2f65f5;
+
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 20px 20px 28px;
+  background: var(--onboarding-bg);
+  color: var(--onboarding-text);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* مهم جداً لتثبيت زر التخطي دداخله */
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.onboarding *,
+.onboarding *::before,
+.onboarding *::after {
+  box-sizing: border-box;
+}
+
+/* دعم الوضع الليلي بمختلف أنواعه */
+.onboarding.dark,
+.dark .onboarding,
+[data-theme="dark"] .onboarding,
+body.dark .onboarding,
+html[data-theme="dark"] .onboarding {
+  --onboarding-bg: #0b0f19 !important;
+  --onboarding-text: #ffffff !important;
+  --onboarding-muted: #9ca3af !important;
+  --onboarding-border: #283243 !important;
+  --onboarding-dot: #374151 !important;
+  --onboarding-primary: #3b82f6 !important;
+}
+
+/* تثبيت زر التخطي في أعلى اليمين (بما أن الصفحة RTL) */
+.skip-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px; /* في الواجهات العربية اليمين هو الـ left أو استخدم right حسب التخطيط، لكن هنا لتثبيته في زاوية الشاشة العليا اليسرى/اليمين بدقة */
+  right: auto; 
+  z-index: 10;
+  margin: 0;
+  padding: 8px 18px;
+  border: 1px solid var(--onboarding-border);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--onboarding-muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* إذا كنت تريد زر التخطي في أقصى اليمين تماماً، استبدل left بـ right */
+.onboarding {
+  direction: rtl;
+}
+
+.skip-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  left: auto;
+}
+
+.skip-btn:hover {
+  background: var(--onboarding-primary);
+  border-color: var(--onboarding-primary);
+  color: #ffffff !important;
+}
+
+.image {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 45px; /* مسافة بسيطة من الأعلى لكي لا يتداخل مع زر التخطي */
+}
+
+.image img {
+  display: block;
+  width: min(100%, 340px);
+  height: 320px;
+  object-fit: cover;
+  border-radius: 24px;
+}
+
+.content {
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  margin-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.content h1 {
+  font-size: clamp(24px, 4.5vw, 34px);
+  color: var(--onboarding-text) !important;
+  margin: 0 0 14px;
+  line-height: 1.4;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.content p {
+  color: var(--onboarding-muted) !important;
+  font-size: clamp(15px, 2.8vw, 18px);
+  line-height: 1.7;
+  margin: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.bottom-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  margin-top: 25px;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.dots span {
+  display: block;
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  background: var(--onboarding-dot);
+  border-radius: 50%;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.dots .active {
+  width: 28px;
+  border-radius: 20px;
+  background: var(--onboarding-primary);
+}
+
+.next-btn {
+  width: 100%;
+  max-width: 420px;
+  min-height: 52px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 16px;
+  background: var(--onboarding-primary);
+  color: #ffffff !important;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.next-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.next-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  .onboarding {
+    padding: 15px 16px 20px;
+  }
+  .skip-btn {
+    top: 15px;
+    right: 15px;
+    padding: 6px 14px;
+    font-size: 14px;
+  }
+  .image img {
+    height: 280px;
+  }
+}

@@ -1,0 +1,32 @@
+/* Onboarding 3 uses the shared onboarding design */
+@import "./Onboarding1.css";
+
+/* إعادة ضبط جميع النقاط لتكون دوائر عادية صغيرة أولاً */
+.onboarding .dots span {
+  width: 10px;
+  height: 10px;
+  background: var(--onboarding-dot);
+  border-radius: 50%;
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+/* تخصيص النقطة الثالثة وحدها لتكون نشطة وعريضة */
+.onboarding .dots span:nth-child(3) {
+  width: 28px;
+  background: var(--onboarding-primary);
+  border-radius: 20px;
+}
+
+.onboarding .dots span:nth-child(3).active {
+  width: 28px;
+  background: var(--onboarding-primary);
+  border-radius: 20px;
+}
+
+/* ضمان بقاء الأولى والثانية كدوائر صغيرة */
+.onboarding .dots span:nth-child(1),
+.onboarding .dots span:nth-child(2) {
+  width: 10px;
+  background: var(--onboarding-dot);
+  border-radius: 50%;
+}

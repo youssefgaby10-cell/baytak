@@ -1,0 +1,53 @@
+.splash{
+    width:100%;
+    height:100vh;
+    background:linear-gradient(180deg,#3D73F4 0%,#2F62E8 100%);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    text-align:center;
+}
+
+.logo{
+    width:90px;
+    margin-bottom:25px;
+}
+
+.splash h1{
+    margin:0;
+    font-size:48px;
+    font-weight:700;
+}
+
+.splash h2{
+    margin-top:8px;
+    font-size:28px;
+    font-weight:600;
+}
+
+.splash p{
+    position:absolute;
+    bottom:90px;
+    font-size:20px;
+    opacity:.9;
+}
+.dots{
+    position:absolute;
+    bottom:45px;
+
+    display:flex;
+    gap:10px;
+}
+
+.dots span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:rgba(255,255,255,.4);
+}
+
+.dots .active{
+    background:white;
+}

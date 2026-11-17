@@ -1,0 +1,188 @@
+/* =========================================
+   NOTIFICATIONS PAGE - STYLES
+========================================= */
+
+.notifications-page {
+  min-height: 100vh;
+  background: #f8f7ff;
+  color: #202124;
+  font-family: Arial, sans-serif;
+  direction: rtl;
+  box-sizing: border-box;
+  padding: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.notifications-page *,
+.notifications-page *::before,
+.notifications-page *::after {
+  box-sizing: border-box;
+}
+
+/* Header */
+.notifications-page header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.notifications-page header button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  color: #202124;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
+}
+
+.notifications-page header button:hover {
+  transform: scale(1.1);
+}
+
+.notifications-page header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Empty / Content Section */
+.notifications-page section {
+  text-align: center;
+  padding: 56px 20px;
+  border-radius: 16px;
+  background: #f1f2fb;
+  border: 1px solid #e1e3ef;
+  box-shadow: 0 2px 8px rgba(40, 50, 90, 0.04);
+}
+
+.notifications-page section svg {
+  font-size: 42px;
+  margin-bottom: 16px;
+  opacity: 0.75;
+  color: #2864e8;
+}
+
+.notifications-page section p {
+  margin: 0;
+  font-size: 16px;
+  color: #747887;
+  font-weight: 500;
+}
+
+/* =========================================
+   DARK MODE SUPPORT
+========================================= */
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page {
+  background: #0b0f19 !important;
+  color: #f5f7fb !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page header button {
+  color: #f5f7fb !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page header h1 {
+  color: #f5f7fb !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page section {
+  background: #151b27 !important;
+  border: 1px solid #283243 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page section svg {
+  color: #3b82f6 !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page section p {
+  color: #9ca3af !important;
+}
+.notifications-page {
+  min-height: 100vh;
+  background: #f8f7ff;
+  color: #202124;
+  font-family: Arial, sans-serif;
+  direction: rtl;
+  box-sizing: border-box;
+  padding: 20px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 28px;
+}
+
+.notifications-header button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  color: #202124;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notifications-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.notifications-content {
+  text-align: center;
+  padding: 56px 20px;
+  border-radius: 16px;
+  background: #f1f2fb;
+  border: 1px solid #e1e3ef;
+}
+
+.notifications-content svg {
+  font-size: 42px;
+  margin-bottom: 16px;
+  color: #2864e8;
+}
+
+.notifications-content p {
+  margin: 0;
+  font-size: 16px;
+  color: #747887;
+  font-weight: 500;
+}
+
+/* الوضع الداكن */
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-page {
+  background: #0b0f19 !important;
+  color: #f5f7fb !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-header button,
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-header h1 {
+  color: #f5f7fb !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-content {
+  background: #151b27 !important;
+  border: 1px solid #283243 !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-content svg {
+  color: #3b82f6 !important;
+}
+
+:is([data-theme="dark"], .dark, body.dark, body.dark-mode) .notifications-content p {
+  color: #9ca3af !important;
+}

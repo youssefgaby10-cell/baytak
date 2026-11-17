@@ -1,0 +1,269 @@
+/* =========================
+   BAYTAK DARK MODE
+========================= */
+
+html.dark-mode,
+html.dark-mode body {
+  background: #10131a;
+  color: #f5f7fb;
+}
+
+/* Main backgrounds */
+
+html.dark-mode .settings-page,
+html.dark-mode .home-page,
+html.dark-mode .favorites-page,
+html.dark-mode .profile-page,
+html.dark-mode .property-details-page,
+html.dark-mode .login-page,
+html.dark-mode .register-page,
+html.dark-mode .reset-password-page,
+html.dark-mode .forgot-password-page,
+html.dark-mode .otp-page {
+  background: #10131a;
+  color: #f5f7fb;
+}
+
+/* Cards */
+
+html.dark-mode .settings-card,
+html.dark-mode .settings-section,
+html.dark-mode .property-card,
+html.dark-mode .profile-card,
+html.dark-mode .login-card,
+html.dark-mode .register-card,
+html.dark-mode .reset-card {
+  background: #181c25;
+  color: #f5f7fb;
+}
+
+/* Text */
+
+html.dark-mode h1,
+html.dark-mode h2,
+html.dark-mode h3,
+html.dark-mode h4,
+html.dark-mode p,
+html.dark-mode label,
+html.dark-mode span {
+  color: inherit;
+}
+
+/* Inputs */
+
+html.dark-mode input,
+html.dark-mode textarea,
+html.dark-mode select {
+  background: #202530;
+  color: #f5f7fb;
+  border-color: #353b48;
+}
+
+html.dark-mode input::placeholder,
+html.dark-mode textarea::placeholder {
+  color: #8d94a3;
+}
+
+/* Search */
+
+html.dark-mode .search-box {
+  background: #202530;
+  border-color: #353b48;
+}
+
+html.dark-mode .search-box input {
+  background: transparent;
+  color: #ffffff;
+}
+
+html.dark-mode .search-box input::placeholder {
+  color: #9299a8;
+}
+
+/* Buttons */
+
+html.dark-mode button {
+  color: inherit;
+}
+
+/* Bottom Navigation */
+
+html.dark-mode .bottom-nav {
+  background: #181c25;
+  border-color: #292f3b;
+}
+
+html.dark-mode .nav-item {
+  color: #9299a8;
+}
+
+html.dark-mode .nav-item.active {
+  color: #4d7dff;
+}
+
+/* Settings Items */
+
+html.dark-mode .settings-item {
+  background: #181c25;
+  color: #f5f7fb;
+}
+
+html.dark-mode .settings-item-left {
+  color: #aeb5c3;
+}
+
+/* Back Buttons */
+
+html.dark-mode .settings-back-btn,
+html.dark-mode .reset-back-btn {
+  background: #202530;
+  color: #ffffff;
+}
+
+/* Requirement Box */
+
+html.dark-mode .password-requirements {
+  background: #202530;
+  border-color: #353b48;
+}
+
+html.dark-mode .password-requirements h3 {
+  color: #ffffff;
+}
+
+html.dark-mode .requirement {
+  color: #aeb5c3;
+}
+
+html.dark-mode .requirement.valid {
+  color: #43d17d;
+}
+
+/* Profile */
+
+html.dark-mode .profile-info,
+html.dark-mode .profile-section,
+html.dark-mode .profile-menu {
+  background: #181c25;
+  color: #ffffff;
+}
+
+/* Suggestions */
+
+html.dark-mode .suggestion-item {
+  background: #181c25;
+  color: #ffffff;
+  border-color: #303642;
+}
+
+html.dark-mode .suggestion-location {
+  color: #9da5b5;
+}
+
+/* Property cards */
+
+html.dark-mode .property-card {
+  border-color: #292f3b;
+}
+
+html.dark-mode .property-card p,
+html.dark-mode .property-card small {
+  color: #9da5b5;
+}
+
+/* Modal */
+
+html.dark-mode .modal,
+html.dark-mode .modal-content {
+  background: #181c25;
+  color: #ffffff;
+}
+
+/* Links */
+
+html.dark-mode a {
+  color: #5c88ff;
+}
+
+/* Scrollbar */
+
+html.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+}
+
+html.dark-mode ::-webkit-scrollbar-track {
+  background: #10131a;
+}
+
+html.dark-mode ::-webkit-scrollbar-thumb {
+  background: #343b49;
+  border-radius: 10px;
+}
+/* =========================
+   SETTINGS - DARK MODE
+========================= */
+
+html.dark-mode .settings-page {
+  background: #10131a;
+  color: #f5f7fb;
+}
+
+html.dark-mode .settings-header {
+  color: #ffffff;
+}
+
+html.dark-mode .settings-header h1 {
+  color: #ffffff;
+}
+
+html.dark-mode .settings-section h2 {
+  color: #aeb6c5;
+}
+
+html.dark-mode .settings-item {
+  background: #181c25;
+  color: #ffffff;
+  border-color: #292f3a;
+}
+
+html.dark-mode .settings-item span {
+  color: #ffffff;
+}
+
+html.dark-mode .settings-item-left {
+  color: #aeb6c5;
+}
+
+html.dark-mode .settings-item-left span {
+  color: #aeb6c5;
+}
+
+html.dark-mode .settings-item svg {
+  color: #aeb6c5;
+}
+
+/* Logout */
+
+html.dark-mode .logout-btn {
+  background: #2a171b;
+  color: #ff6b73;
+  border: 1px solid #54252b;
+}
+
+html.dark-mode .logout-btn svg {
+  color: #ff6b73;
+}
+
+html.dark-mode .logout-btn:hover {
+  background: #351b20;
+  color: #ff858c;
+}
+html.dark-mode .settings-page * {
+  border-color: #292f3a;
+}
+
+html.dark-mode .settings-page .settings-item span,
+html.dark-mode .settings-page .settings-item h2,
+html.dark-mode .settings-page .settings-item-left {
+  color: #ffffff;
+}

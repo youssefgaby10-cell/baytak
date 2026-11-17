@@ -1,0 +1,540 @@
+.edit-profile-page {
+  min-height: 100vh;
+  padding: 20px;
+
+  background: #f8f7ff;
+  color: #202124;
+
+  direction: rtl;
+  box-sizing: border-box;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+/* =========================
+   Header
+========================= */
+
+.edit-profile-header {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 60px;
+  margin-bottom: 25px;
+}
+
+.edit-profile-header h1 {
+  margin: 0;
+
+  color: #202124;
+
+  font-size: 27px;
+  font-weight: 700;
+
+  transition: color 0.25s ease;
+}
+
+.edit-profile-back-btn {
+  position: absolute;
+
+  right: 0;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #ffffff;
+  color: #075bd5;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08);
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.edit-profile-back-btn:hover {
+  background: #eef4ff;
+}
+
+/* =========================
+   Profile Picture
+========================= */
+
+.profile-picture-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin-bottom: 30px;
+}
+
+.profile-picture {
+  width: 105px;
+  height: 105px;
+
+  margin-bottom: 12px;
+
+  border-radius: 50%;
+
+  overflow: hidden;
+
+  background: #e8edf5;
+
+  border: 4px solid #ffffff;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.12);
+
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.profile-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #dbe3ee;
+  color: #667085;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.profile-placeholder span {
+  font-size: 36px;
+  font-weight: 700;
+}
+
+.change-photo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 9px 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background: transparent;
+  color: #075bd5;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.change-photo-btn:hover {
+  background: #eef4ff;
+}
+
+.change-photo-btn svg {
+  font-size: 16px;
+}
+
+/* =========================
+   Form
+========================= */
+
+.edit-profile-form {
+  width: 100%;
+  max-width: 600px;
+
+  margin: 0 auto;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #344054;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  transition: color 0.25s ease;
+}
+
+.form-group input {
+  width: 100%;
+  height: 52px;
+
+  padding: 0 15px;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+
+  outline: none;
+
+  background: #ffffff;
+  color: #202124;
+
+  font-family: inherit;
+  font-size: 15px;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-group input::placeholder {
+  color: #98a2b3;
+}
+
+.form-group input:focus {
+  border-color: #075bd5;
+
+  box-shadow:
+    0 0 0 3px rgba(7, 91, 213, 0.1);
+}
+
+/* =========================
+   Error
+========================= */
+
+.edit-profile-error {
+  display: block;
+
+  margin-top: 7px;
+
+  color: #d92d20;
+
+  font-size: 13px;
+}
+
+/* =========================
+   Account Type
+========================= */
+
+.account-type {
+  width: 100%;
+  min-height: 52px;
+
+  padding: 0 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+
+  background: #f2f4f7;
+  color: #667085;
+
+  box-sizing: border-box;
+
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.account-type span {
+  font-size: 15px;
+}
+
+.account-type svg {
+  font-size: 16px;
+}
+
+/* =========================
+   Save Button
+========================= */
+
+.save-profile-btn {
+  width: 100%;
+  height: 54px;
+
+  margin-top: 10px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #075bd5 !important;
+  color: #ffffff !important; /* تأكيد ظهور النص باللون الأبيض الصريح */
+
+  font-family: inherit;
+
+  font-size: 16px;
+  font-weight: 700;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.save-profile-btn:hover {
+  background: #064caf !important;
+  color: #ffffff !important;
+
+  transform: translateY(-1px);
+}
+
+/* =========================
+   Cancel Button
+========================= */
+
+.cancel-profile-btn {
+  width: 100%;
+  height: 52px;
+
+  margin-top: 12px;
+
+  border: 1px solid #d0d5dd;
+  border-radius: 12px;
+
+  background: #ffffff;
+  color: #344054;
+
+  font-family: inherit;
+
+  font-size: 16px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.cancel-profile-btn:hover {
+  background: #f2f4f7;
+}
+
+/* =========================
+   DARK MODE
+========================= */
+
+[data-theme="dark"] .edit-profile-page {
+  background: #10131a;
+  color: #f5f7fb;
+}
+
+[data-theme="dark"] .edit-profile-header h1 {
+  color: #ffffff;
+}
+
+[data-theme="dark"] .edit-profile-back-btn {
+  background: #202530;
+  color: #6f9aff;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .edit-profile-back-btn:hover {
+  background: #292f3a;
+}
+
+[data-theme="dark"] .profile-picture {
+  background: #252b36;
+  border-color: #252b36;
+
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="dark"] .profile-placeholder {
+  background: #303744;
+  color: #c2c9d4;
+}
+
+[data-theme="dark"] .change-photo-btn {
+  color: #6f9aff;
+}
+
+[data-theme="dark"] .change-photo-btn:hover {
+  background: #202a40;
+}
+
+[data-theme="dark"] .form-group label {
+  color: #e6e9ef;
+}
+
+[data-theme="dark"] .form-group input {
+  background: #1b2029;
+  color: #ffffff;
+
+  border-color: #343b48;
+}
+
+[data-theme="dark"] .form-group input::placeholder {
+  color: #858e9e;
+}
+
+[data-theme="dark"] .form-group input:focus {
+  border-color: #5d88ff;
+
+  box-shadow:
+    0 0 0 3px rgba(93, 136, 255, 0.15);
+}
+
+[data-theme="dark"] .account-type {
+  background: #202530;
+  color: #c0c7d3;
+
+  border-color: #343b48;
+}
+
+[data-theme="dark"] .cancel-profile-btn {
+  background: #1b2029;
+  color: #ffffff;
+
+  border-color: #343b48;
+}
+
+[data-theme="dark"] .cancel-profile-btn:hover {
+  background: #252b35;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+  .edit-profile-page {
+    padding: 15px;
+  }
+
+  .edit-profile-header {
+    min-height: 55px;
+    margin-bottom: 20px;
+  }
+
+  .edit-profile-header h1 {
+    font-size: 22px;
+  }
+
+  .edit-profile-back-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .profile-picture {
+    width: 95px;
+    height: 95px;
+  }
+
+  .form-group {
+    margin-bottom: 17px;
+  }
+
+  .form-group input,
+  .account-type {
+    height: 50px;
+  }
+}
+
+@media (max-width: 400px) {
+  .edit-profile-page {
+    padding: 12px;
+  }
+
+  .edit-profile-header h1 {
+    font-size: 20px;
+  }
+
+  .profile-picture {
+    width: 88px;
+    height: 88px;
+  }
+
+  .profile-placeholder span {
+    font-size: 30px;
+  }
+
+  .form-group label {
+    font-size: 14px;
+  }
+
+  .form-group input,
+  .account-type {
+    font-size: 14px;
+  }
+}
+/* =========================
+   Profile Image
+========================= */
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.profile-image-input {
+  display: none;
+}
+
+
+/* =========================
+   Dark Mode - Profile Image
+========================= */
+
+[data-theme="dark"] .profile-image {
+  background: #252b36;
+}
+
+
+/* =========================
+   Photo Button
+========================= */
+
+[data-theme="dark"] .change-photo-btn {
+  color: #6f9aff;
+}
+
+[data-theme="dark"] .change-photo-btn:hover {
+  background: #202a40;
+}

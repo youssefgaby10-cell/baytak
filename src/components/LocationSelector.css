@@ -1,0 +1,261 @@
+
+.location-picker {
+  direction: rtl;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid #28364a;
+  border-radius: 20px;
+  background: #111722;
+  color: #f4f7fc;
+  box-sizing: border-box;
+}
+
+.location-picker-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.location-picker-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  background: #192c47;
+  font-size: 23px;
+}
+
+.location-picker-heading h3 {
+  margin: 0 0 5px;
+  font-size: 17px;
+}
+
+.location-picker-heading p,
+.location-map-tip {
+  margin: 0;
+  color: #9ca9bd;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.location-open-button,
+.location-confirm-button,
+.location-blue-button,
+.location-search-form button {
+  border: 0;
+  border-radius: 12px;
+  background: #1677ff;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.location-open-button {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.location-confirm-button {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 14px;
+}
+
+.location-open-button:hover,
+.location-confirm-button:hover,
+.location-blue-button:hover,
+.location-search-form button:hover {
+  background: #0864df;
+  transform: translateY(-1px);
+}
+
+.location-map-panel {
+  margin-top: 18px;
+  padding: 14px;
+  border: 1px solid #2a3b52;
+  border-radius: 16px;
+  background: #0c121c;
+}
+
+.location-search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.location-search-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #34445b;
+  border-radius: 11px;
+  outline: none;
+  background: #151e2b;
+  color: #fff;
+  font: inherit;
+}
+
+.location-search-form input:focus {
+  border-color: #1677ff;
+  box-shadow: 0 0 0 3px #1677ff25;
+}
+
+.location-search-form button {
+  padding: 0 17px;
+}
+
+.location-search-form button:disabled,
+.location-blue-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.location-map-tip {
+  margin-bottom: 12px;
+}
+
+.location-map {
+  height: 370px;
+  overflow: hidden;
+  border: 1px solid #34445b;
+  border-radius: 14px;
+  background: #202b39;
+}
+
+.location-map .leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+  font-family: inherit;
+}
+
+.location-address-preview {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #2a3b52;
+  border-radius: 12px;
+  background: #151e2b;
+}
+
+.location-address-preview strong {
+  color: #7eb3ff;
+  font-size: 13px;
+}
+
+.location-address-preview p,
+.location-selected-info p {
+  margin: 5px 0 0;
+  color: #c1ccdc;
+  font-size: 13px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.location-map-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.location-map-actions button {
+  flex: 1;
+  min-height: 48px;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.location-blue-button {
+  border: 0;
+  background: #1677ff;
+  color: white;
+}
+
+.location-cancel-button,
+.location-change-button {
+  border: 1px solid #35445a;
+  background: #17202d;
+  color: #cbd5e4;
+}
+
+.location-cancel-button:hover,
+.location-change-button:hover {
+  border-color: #1677ff;
+}
+
+.location-selected-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 14px;
+  border: 1px solid #205b46;
+  border-radius: 14px;
+  background: #10251f;
+}
+
+.location-status-dot {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #31d49a;
+  box-shadow: 0 0 12px #31d49a70;
+}
+
+.location-selected-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.location-selected-info strong {
+  color: #6ce6b7;
+  font-size: 14px;
+}
+
+.location-change-button {
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.location-error {
+  margin: 10px 0;
+  color: #ff8e98;
+  font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .location-picker {
+    padding: 14px;
+  }
+
+  .location-map-panel {
+    padding: 9px;
+  }
+
+  .location-map {
+    height: 320px;
+  }
+
+  .location-search-form {
+    flex-direction: column;
+  }
+
+  .location-search-form button {
+    min-height: 43px;
+  }
+}

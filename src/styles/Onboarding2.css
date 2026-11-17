@@ -1,0 +1,29 @@
+/* Onboarding 2 uses the shared onboarding design */
+@import "./Onboarding1.css";
+
+/* تحديد النقطة الثانية وتفعيلها بشكل صحيح */
+.onboarding .dots span {
+  width: 10px;
+  border-radius: 50%;
+  background: var(--onboarding-dot);
+}
+
+.onboarding .dots span:nth-child(2) {
+  width: 28px;
+  background: var(--onboarding-primary);
+  border-radius: 20px;
+}
+
+.onboarding .dots span:nth-child(2).active {
+  width: 28px;
+  background: var(--onboarding-primary);
+  border-radius: 20px;
+}
+
+/* إعادة ضبط النقاط الأخرى الباقية */
+.onboarding .dots span:nth-child(1),
+.onboarding .dots span:nth-child(3) {
+  width: 10px;
+  background: var(--onboarding-dot);
+  border-radius: 50%;
+}
