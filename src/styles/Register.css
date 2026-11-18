@@ -1,15 +1,13 @@
 /* ===========================
-   Login Page
+   Register Page
 =========================== */
 
 .register-page{
     min-height:100vh;
     background:#f6f7fb;
-
     display:flex;
     flex-direction:column;
     align-items:center;
-
     padding:50px 20px;
 }
 
@@ -42,7 +40,7 @@
     margin-bottom:8px;
 }
 
-.login-subtitle{
+.register-subtitle{
     color:#777;
     font-size:15px;
     line-height:1.6;
@@ -55,14 +53,12 @@
 }
 
 /* ===========================
-   Login Card
+   Register Card
 =========================== */
 
 .register-card{
     width:430px;
     max-width:100%;
-    min-height:900px;
-
     background:#fff;
     border-radius:24px;
     padding:35px;
@@ -75,421 +71,155 @@
 =========================== */
 
 .input-group{
-
     display:flex;
-
     flex-direction:column;
-
     margin-bottom:20px;
-
 }
 
 .input-group label{
-
     font-size:15px;
-
     font-weight:600;
-
     color:#222;
-
     margin-bottom:8px;
-
 }
 
 .input-group input{
-
     width:100%;
-
     height:54px;
-
     border:1px solid #ddd;
-
     border-radius:12px;
-
     padding:0 16px;
-
     font-size:16px;
-
     outline:none;
-
     box-sizing:border-box;
-
     transition:.3s;
-
 }
 
 .input-group input:focus{
-
     border-color:#2F61FF;
-
     box-shadow:0 0 0 3px rgba(47,97,255,.12);
-
 }
 
 /* ===========================
-   Remember + Forgot
+   Password Input & Eye
 =========================== */
 
-.login-options{
-
-    display:flex;
-
-    justify-content:space-between;
-
-    align-items:center;
-
-    margin-bottom:24px;
-
+.password-wrapper{
+    position: relative;
+    width: 100%;
 }
 
-.remember-me{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    color:#555;
-
-    font-size:14px;
-
-}
-
-.remember-me input{
-
-    width:16px;
-
-    height:16px;
-
-}
-
-.forgot-link{
-
-    color:#2F61FF;
-
-    text-decoration:none;
-
-    font-size:14px;
-
-    font-weight:600;
-
-}
-
-.forgot-link:hover{
-
-    text-decoration:underline;
-
-}
-
-/* ===========================
-   Login Button
-=========================== */
-
-.register-btn{
-
+.password-input{
     width:100%;
-
     height:54px;
-
-    border:none;
-
+    padding:0 50px 0 15px;
+    border:1px solid #d9d9d9;
     border-radius:12px;
-
-    background:#2F61FF;
-
-    color:#fff;
-
-    font-size:18px;
-
-    font-weight:600;
-
-    cursor:pointer;
-
-    transition:.3s;
-
-}
-
-.register-btn:hover{
-
-    background:#1E4ED8;
-
-}
-
-/* ===========================
-   Divider
-=========================== */
-
-.divider{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:12px;
-
-    margin:28px 0;
-
-    color:#999;
-
-    font-size:13px;
-
-}
-
-.divider::before,
-.divider::after{
-
-    content:"";
-
-    flex:1;
-
-    height:1px;
-
-    background:#ddd;
-
-}
-
-/* ===========================
-   Google Button
-=========================== */
-
-.google-btn{
-
-    width:100%;
-
-    height:54px;
-
-    border:1px solid #ddd;
-
-    border-radius:12px;
-
-    background:#fff;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    gap:12px;
-
-    cursor:pointer;
-
     font-size:16px;
-
-    font-weight:600;
-
-    transition:.3s;
-
+    box-sizing:border-box;
+    outline: none;
 }
 
-.google-btn:hover{
-
-    background:#f8f8f8;
-
+.eye-btn{
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #777;
+    font-size: 20px;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    z-index: 10;
 }
 
-.google-icon{
-
-    width:22px;
-
-    height:22px;
-
+.eye-btn:hover{
+    color:#2563eb;
 }
+
 /* ===========================
    Account Type
 =========================== */
 
 .account-type{
-
-    margin-top:35px;
-
+    margin-top:25px;
+    margin-bottom:20px;
+    position: relative;
+    z-index: 1;
 }
 
 .account-type h3{
-
     text-align:center;
-
     font-size:18px;
-
     font-weight:700;
-
     color:#222;
-
-    margin-bottom:18px;
-
+    margin-bottom:15px;
 }
 
 .account-cards{
-
     display:flex;
-
-    gap:16px;
-
+    gap:12px;
 }
 
 .account-card{
-
     flex:1;
-
     background:#fff;
-
     border:2px solid #e5e5e5;
-
-    border-radius:18px;
-
-    padding:22px 16px;
-
+    border-radius:16px;
+    padding:15px 12px;
     cursor:pointer;
-
     transition:.3s;
-
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
-
     text-align:center;
-
 }
 
 .account-card:hover{
-
     border-color:#2F61FF;
-
-    transform:translateY(-4px);
-
+    transform:translateY(-3px);
     box-shadow:0 8px 20px rgba(47,97,255,.12);
-
 }
 
 .account-card.active{
-
     border-color:#2F61FF;
-
     background:#EEF4FF;
-
 }
 
 .account-icon{
-
-    font-size:42px;
-
-    margin-bottom:12px;
-
+    font-size:32px;
+    margin-bottom:8px;
 }
 
 .account-card h4{
-
-    margin:0;
-
-    font-size:18px;
-
+    margin:0 0 5px 0;
+    font-size:16px;
     color:#222;
-
     font-weight:700;
-
 }
 
 .account-card p{
-
-    margin-top:10px;
-
+    margin:0;
     color:#777;
-
-    font-size:13px;
-
-    line-height:1.5;
-
+    font-size:12px;
+    line-height:1.4;
 }
 
 /* ===========================
-   Register
-=========================== */
-
-.register-text{
-
-    text-align:center;
-
-    margin-top:28px;
-
-    color:#666;
-
-    font-size:15px;
-
-}
-
-.register-text a{
-
-    color:#2F61FF;
-
-    font-weight:700;
-
-    text-decoration:none;
-
-}
-
-.register-text a:hover{
-
-    text-decoration:underline;
-
-}
-
-/* ===========================
-   Responsive
-=========================== */
-
-@media (max-width:500px){
-
-    .register-page{
-        padding: 20px 10px;
-    }
-
-    .register-card{
-        width: 100%;
-        min-height: auto;
-        padding: 20px 15px;
-        border-radius: 20px;
-        box-sizing: border-box;
-    }
-
-    .logo-section h1{
-        font-size: 34px;
-    }
-
-    .logo-section h2{
-        font-size: 26px;
-    }
-
-    .account-cards{
-        display: flex;
-        flex-direction: column !important;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .account-card{
-        width: 100% !important;
-        flex: none;
-        padding: 15px 10px;
-    }
-}
-
-/* ===========================
-   Terms & Conditions
+   Terms Check
 =========================== */
 
 .terms-check{
     display:flex;
     align-items:flex-start;
     gap:10px;
-    margin:22px 0;
+    margin:20px 0;
     font-size:14px;
     color:#555;
-    line-height:1.6;
+    line-height:1.5;
 }
 
 .terms-check input{
@@ -500,7 +230,7 @@
 }
 
 .terms-check a{
-    color:#2563eb;
+    color:#2F61FF;
     text-decoration:none;
     font-weight:600;
 }
@@ -509,24 +239,122 @@
     text-decoration:underline;
 }
 
+/* ===========================
+   Buttons & Divider
+=========================== */
+
+.register-btn{
+    width:100%;
+    height:54px;
+    border:none;
+    border-radius:12px;
+    background:#2F61FF;
+    color:#fff;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.register-btn:hover{
+    background:#1E4ED8;
+}
+
+.divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    margin:25px 0;
+    color:#999;
+    font-size:13px;
+}
+
+.divider::before,
+.divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:#ddd;
+}
+
+.google-btn{
+    width:100%;
+    height:54px;
+    border:1px solid #ddd;
+    border-radius:12px;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.google-btn:hover{
+    background:#f8f8f8;
+}
+
+.google-icon{
+    width:22px;
+    height:22px;
+}
+
+.login-text{
+    text-align:center;
+    margin-top:25px;
+    color:#666;
+    font-size:15px;
+}
+
+.login-text a{
+    color:#2F61FF;
+    font-weight:700;
+    text-decoration:none;
+}
+
+.login-text a:hover{
+    text-decoration:underline;
+}
+
 .error-text{
     display:block;
     color:#ef4444;
     font-size:13px;
-    margin-top:6px;
+    margin-top:5px;
     margin-left:4px;
     font-weight:500;
 }
-/* حل حاسم لتداخل الكارتات على الموبايل */
-@media (max-width: 768px) {
-  .account-cards {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 12px !important;
-    width: 100% !important;
-  }
-  .account-card {
-    width: 100% !important;
-    flex: unset !important;
-  }
+
+/* ===========================
+   Responsive Mobile Fix
+=========================== */
+
+@media (max-width: 600px) {
+    .register-page {
+        padding: 15px 10px;
+    }
+
+    .register-card {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 20px 15px !important;
+        border-radius: 18px;
+    }
+
+    .account-cards {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+
+    .account-card {
+        width: 100% !important;
+        flex: unset !important;
+        padding: 12px !important;
+    }
 }
