@@ -528,12 +528,15 @@
     }
 
     .account-cards{
-        flex-direction: column;
+        display: flex;
+        flex-direction: column !important;
         gap: 12px;
+        width: 100%;
     }
 
     .account-card{
-        width: 100%;
+        width: 100% !important;
+        flex: none;
         padding: 15px 10px;
     }
 }

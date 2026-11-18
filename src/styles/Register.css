@@ -444,23 +444,37 @@
 
 @media (max-width:500px){
 
-    .register-card{
-        width:100%;
-        min-height: auto; /* إلغاء الطول الثابت الذي يسبب المشكلة في الموبايل */
-        padding:25px;
-        border-radius:20px;
+    .register-page{
+        padding: 20px 10px;
     }
 
-    .account-cards{
-        flex-direction:column;
+    .register-card{
+        width: 100%;
+        min-height: auto;
+        padding: 20px 15px;
+        border-radius: 20px;
+        box-sizing: border-box;
     }
 
     .logo-section h1{
-        font-size:38px;
+        font-size: 34px;
     }
 
     .logo-section h2{
-        font-size:30px;
+        font-size: 26px;
+    }
+
+    .account-cards{
+        display: flex;
+        flex-direction: column !important;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .account-card{
+        width: 100% !important;
+        flex: none;
+        padding: 15px 10px;
     }
 }
 
