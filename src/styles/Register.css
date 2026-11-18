@@ -517,3 +517,16 @@
     margin-left:4px;
     font-weight:500;
 }
+/* حل حاسم لتداخل الكارتات على الموبايل */
+@media (max-width: 768px) {
+  .account-cards {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+  .account-card {
+    width: 100% !important;
+    flex: unset !important;
+  }
+}
