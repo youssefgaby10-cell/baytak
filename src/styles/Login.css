@@ -361,30 +361,34 @@
     font-weight:500;
 }
 
-/* ===========================
-   Responsive Mobile Fix
-=========================== */
-
-/* حل جذري لتداخل الكارتات على الموبايل لكل شاشات العرض الصغيره */
 @media (max-width: 600px) {
-  .login-card, .register-card {
-    display: flex;
-    flex-direction: column;
+  .login-page .account-type,
+  .register-page .account-type {
+    height: auto !important;
+    min-height: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    position: static !important;
   }
-  
-  /* نقل قسم الحسابات ليكون مرتباً وعمودياً بالكامل */
-  .account-cards {
+
+  .login-page .account-cards,
+  .register-page .account-cards {
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
-    width: 100% !important;
-    order: -1; /* بيخليه يطلع فوق أو يتترتب صح جوه الكارد */
-    margin-bottom: 20px !important;
+    gap: 12px;
+    width: 100%;
+    position: static !important;
   }
 
-  .account-card {
+  .login-page .account-card,
+  .register-page .account-card {
+    position: static !important;
     width: 100% !important;
+    height: auto !important;
     flex: none !important;
-    padding: 12px !important;
+    margin: 0 !important;
+    transform: none !important;
   }
 }
