@@ -1,4 +1,7 @@
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { getAuthErrorMessage } from "../../utils/authErrors.js";
+import { useSeo } from "../../utils/useSeo.js";
 import "../../styles/Register.css";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -6,18 +9,15 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import ReCAPTCHA from "react-google-recaptcha";
 
 function Register() {
-  const getRegisteredUsers = () => {
-    try {
-      const users = JSON.parse(
-        localStorage.getItem("baytakUsers") || "[]"
-      );
-      return Array.isArray(users) ? users : [];
-    } catch {
-      return [];
-    }
-  };
+  const { t, language } = useLanguage();
+  const { register } = useAuth();
 
-  const { t } = useLanguage();
+  useSeo({
+    title: "إنشاء حساب | Baytak",
+    description:
+      "أنشئ حسابك المجاني في Baytak كمستأجر أو مالك، وابدأ البحث عن عقارك أو انشر إعلانك.",
+  });
+  const isArabic = language === "ar";
   const navigate = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState("");
@@ -33,8 +33,11 @@ function Register() {
   const [captchaVerified, setCaptchaVerified] = useState(false); // حالة الكابتشا
 
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    if (submitting) return;
+
     let newErrors = {};
 
     if (!fullName.trim()) {
@@ -51,6 +54,10 @@ function Register() {
 
     if (!password) {
       newErrors.password = t.passwordRequired || "Password is required.";
+    } else if (password.length < 8) {
+      newErrors.password = isArabic
+        ? "كلمة المرور يجب ألا تقل عن 8 أحرف."
+        : "Password must be at least 8 characters.";
     }
 
     if (!confirmPassword) {
@@ -65,6 +72,12 @@ function Register() {
       newErrors.role = t.chooseAccountType || "Please choose an account type.";
     }
 
+    if (!termsAccepted) {
+      newErrors.terms = isArabic
+        ? "يجب الموافقة على الشروط وسياسة الخصوصية."
+        : "You must accept the terms and privacy policy.";
+    }
+
     if (!captchaVerified) {
       newErrors.captcha = "Please verify that you are not a robot.";
     }
@@ -77,46 +90,29 @@ function Register() {
 
     const accountType = selectedRole === "owner" ? "مالك" : "مستأجر";
 
+    setSubmitting(true);
+
     try {
-      const registeredUsers = getRegisteredUsers();
-      const normalizedEmail = email.trim().toLowerCase();
-
-      const emailExists = registeredUsers.some(
-        (user) => user.email?.trim().toLowerCase() === normalizedEmail
-      );
-
-      if (emailExists) {
-        setErrors({
-          email: "This email is already registered.",
-        });
-        return;
-      }
-
-      const newUser = {
-        id: crypto.randomUUID(),
-        fullName: fullName.trim(),
-        name: fullName.trim(),
-        email: normalizedEmail,
-        phone: phone.trim(),
+      await register({
+        fullName,
+        email,
+        phone,
         password,
         accountType,
-        profileImage: "",
-      };
-
-      const updatedUsers = [...registeredUsers, newUser];
-
-      localStorage.setItem("baytakUsers", JSON.stringify(updatedUsers));
-      localStorage.setItem("baytakUser", JSON.stringify(newUser));
-      localStorage.removeItem("baytakLoggedIn");
+      });
 
       alert(t.accountCreatedSuccessfully || "Account created successfully!");
       navigate("/login");
-
     } catch (error) {
       console.error("Error creating account:", error);
-      setErrors({
-        general: t.somethingWentWrongTryAgain || "Something went wrong, please try again.",
-      });
+
+      if (error?.code === "auth/email-already-in-use") {
+        setErrors({ email: "This email is already registered." });
+      } else {
+        setErrors({ general: getAuthErrorMessage(error, isArabic) });
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -130,6 +126,12 @@ function Register() {
       </div>
 
       <div className="register-card">
+        {errors.general && (
+          <span className="error-text" role="alert">
+            {errors.general}
+          </span>
+        )}
+
         {/* Full Name */}
         <div className="input-group">
           <label>{t.fullName}</label>
@@ -255,12 +257,13 @@ function Register() {
             <a href="#">{t.privacyPolicy}</a>
           </span>
         </label>
+        {errors.terms && <span className="error-text">{errors.terms}</span>}
 
         {/* reCAPTCHA */}
         <div style={{ margin: "15px 0", display: "flex", justifyContent: "center" }}>
           <ReCAPTCHA
             sitekey="6LdDHCIuAAAAAKESaC0_FH_twfDhlOaXIwaiZ7S2"
-            theme="dark"
+            theme="light"
             onChange={(value) => {
               if (value) setCaptchaVerified(true);
             }}
@@ -274,8 +277,13 @@ function Register() {
           type="button"
           className="register-btn"
           onClick={handleRegister}
+          disabled={submitting}
         >
-          {t.createAccount}
+          {submitting
+            ? isArabic
+              ? "جارٍ إنشاء الحساب..."
+              : "Creating account..."
+            : t.createAccount}
         </button>
 
         {/* Divider */}

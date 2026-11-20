@@ -320,7 +320,7 @@ function SearchBar({
               className="suggestion-item"
               onClick={() => {
                 setShowSuggestions(false);
-                navigate("/property-details", { state: property });
+                navigate(`/property/${property.id}`, { state: property });
               }}
             >
               <div className="suggestion-title">

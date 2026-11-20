@@ -7,10 +7,12 @@ import {
 } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 import "../../styles/EditProfile.css";
 
 function EditProfile() {
   const { t } = useLanguage();
+  const { updateUserProfile } = useAuth();
 
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -106,7 +108,7 @@ function EditProfile() {
     reader.readAsDataURL(file);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const newErrors = {};
 
     if (!fullName.trim()) {
@@ -130,36 +132,12 @@ function EditProfile() {
     }
 
     try {
-      const savedUser =
-        localStorage.getItem("baytakUser");
-
-      let oldUser = {};
-
-      if (savedUser) {
-        oldUser = JSON.parse(savedUser);
-      }
-
-      const updatedUser = {
-        ...oldUser,
-
+      // البريد ونوع الحساب لا يُعدَّلان من هنا
+      await updateUserProfile({
         fullName: fullName.trim(),
-
         phone: phone.trim(),
-
-        email: email.trim(),
-
-        accountType: accountType,
-
-        profileImage:
-          profileImage ||
-          oldUser.profileImage ||
-          "",
-      };
-
-      localStorage.setItem(
-        "baytakUser",
-        JSON.stringify(updatedUser)
-      );
+        profileImage: profileImage || "",
+      });
 
       navigate("/settings");
     } catch (error) {
@@ -169,7 +147,7 @@ function EditProfile() {
       );
 
       alert(
-        "حدث خطأ أثناء حفظ البيانات. حاول اختيار صورة أصغر أو مختلفة."
+        "حدث خطأ أثناء حفظ البيانات. حاول مرة أخرى."
       );
     }
   };

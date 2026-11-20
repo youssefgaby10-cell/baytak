@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useTheme } from "../../context/ThemeContext";
 import { useLanguage } from "../../context/LanguageContext";
+import { useAuth } from "../../context/AuthContext";
 
 import {
   FaArrowRight,
@@ -27,6 +28,7 @@ function Settings() {
 
   const { darkMode, toggleDarkMode } = useTheme();
   const { language, t } = useLanguage();
+  const { logout } = useAuth();
 
   /* Notifications */
   const [notificationsEnabled, setNotificationsEnabled] =
@@ -375,15 +377,9 @@ function Settings() {
       window.confirm(message);
 
     if (confirmLogout) {
-      localStorage.removeItem(
-        "baytakLoggedIn"
-      );
-
-      localStorage.removeItem(
-        "baytakStaySignedIn"
-      );
-
-      navigate("/login");
+      logout().finally(() => {
+        navigate("/login");
+      });
     }
   }}
 >

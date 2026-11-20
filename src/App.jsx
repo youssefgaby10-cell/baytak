@@ -1,13 +1,9 @@
 import AppRoutes from "./routes/AppRoutes";
-import { ThemeProvider } from "./context/ThemeContext";
 import "./styles/DarkMode.css";
 
+// ThemeProvider موجود بالفعل في main.jsx
 function App() {
-  return (
-    <ThemeProvider>
-      <AppRoutes />
-    </ThemeProvider>
-  );
+  return <AppRoutes />;
 }
 
 export default App;

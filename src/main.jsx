@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 
 import { LanguageProvider } from "./context/LanguageContext";
+import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { PropertyProvider } from "./context/PropertyContext";
 
@@ -16,11 +17,15 @@ ReactDOM.createRoot(
 
       <ThemeProvider>
 
-        <PropertyProvider>
+        <AuthProvider>
 
-          <App />
+          <PropertyProvider>
 
-        </PropertyProvider>
+            <App />
+
+          </PropertyProvider>
+
+        </AuthProvider>
 
       </ThemeProvider>
 

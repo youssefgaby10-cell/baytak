@@ -97,8 +97,8 @@ export function PropertyProvider({ children }) {
       const fetchedProperties = snapshot.docs.map((docSnap) => {
         const data = docSnap.data();
         return {
-          id: docSnap.id, // استخدام معرف فايربيز الحقيقي
           ...data,
+          id: docSnap.id, // معرف Firestore الحقيقي (يأتي أخيراً حتى لا يستبدله أي id قديم داخل البيانات)
           isFavorite: favoriteIds.includes(String(docSnap.id)),
           features: withFeatures(data.features),
         };
@@ -118,8 +118,10 @@ export function PropertyProvider({ children }) {
   const addProperty = async (newProperty) => {
     try {
       const user = getCurrentUser();
+      const propertyWithoutId = { ...newProperty };
+      delete propertyWithoutId.id; // معرف العقار هو معرف مستند Firestore
       const propertyData = {
-        ...newProperty,
+        ...propertyWithoutId,
         ownerId: getUserId(user),
         category: newProperty.category || "Residential",
         features: withFeatures(newProperty.features),
@@ -143,8 +145,10 @@ export function PropertyProvider({ children }) {
       delete cleanData.id; // لا نحفظ الـ id داخل الحقول
 
       await updateDoc(propertyRef, cleanData);
+      return { success: true };
     } catch (error) {
       console.error("خطأ في تحديث العقار:", error);
+      return { success: false };
     }
   };
 
@@ -152,7 +156,8 @@ export function PropertyProvider({ children }) {
     const userId = getUserId(getCurrentUser());
 
     if (!userId) {
-      console.warn("يجب تسجيل الدخول أولاً لإضافة العقارات إلى المفضلة.");
+      // الزائر (غير المسجل) يُحوَّل لتسجيل الدخول
+      window.location.assign("/login");
       return;
     }
 
@@ -194,8 +199,11 @@ export function PropertyProvider({ children }) {
       setViewingRequests((prev) =>
         prev.filter((request) => String(request.propertyId) !== String(id))
       );
+
+      return { success: true };
     } catch (error) {
       console.error("خطأ أثناء حذف العقار:", error);
+      return { success: false };
     }
   };
 

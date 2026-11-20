@@ -3,9 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function Header() {
   const { t } = useLanguage();
+  const { loading: authLoading, user: authUser } = useAuth();
   const navigate = useNavigate();
 
   const [profileImage, setProfileImage] = useState("");
@@ -59,8 +61,38 @@ function Header() {
   }, []);
 
   const navigateToProfile = () => {
-    window.location.href = "/profile";
+    navigate("/profile");
   };
+
+  // زائر غير مسجل: نعرض أزرار الدخول بدل بيانات المستخدم
+  if (!authLoading && !authUser) {
+    return (
+      <header
+        className="home-header"
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "10px" }}
+      >
+        <h3 className="username" style={{ margin: 0 }}>Baytak</h3>
+
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            style={{ padding: "8px 16px", borderRadius: "10px", border: "1px solid #2563eb", background: "#2563eb", color: "#fff", fontWeight: 700, cursor: "pointer" }}
+          >
+            {t.login}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => navigate("/register")}
+            style={{ padding: "8px 16px", borderRadius: "10px", border: "1px solid #2563eb", background: "transparent", color: "#2563eb", fontWeight: 700, cursor: "pointer" }}
+          >
+            {t.register}
+          </button>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="home-header">

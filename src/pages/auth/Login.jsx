@@ -2,29 +2,22 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { getAuthErrorMessage } from "../../utils/authErrors.js";
 import "../../styles/Login.css";
-import { signInWithPopup } from "firebase/auth";
-import { auth, googleProvider } from "../../firebase/firebase.js";
 import ReCAPTCHA from "react-google-recaptcha";
-
-const OTP_API =
-  "https://baytak-otp.youssefgaby10.workers.dev";
-
-const getRegisteredUsers = () => {
-  try {
-    const users = JSON.parse(
-      localStorage.getItem("baytakUsers") || "[]"
-    );
-
-    return Array.isArray(users) ? users : [];
-  } catch {
-    return [];
-  }
-};
+import { useSeo } from "../../utils/useSeo.js";
 
 function Login() {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
+  const { login, loginWithGoogle } = useAuth();
+
+  useSeo({
+    title: "تسجيل الدخول | Baytak",
+    description:
+      "سجّل الدخول إلى Baytak للبحث عن شقق وعقارات للبيع والإيجار أو لنشر عقاراتك وإدارتها.",
+  });
 
   const isArabic = language === "ar";
 
@@ -37,14 +30,8 @@ function Login() {
   const [staySignedIn, setStaySignedIn] = useState(false);
 
   const [errors, setErrors] = useState({});
-
-  // OTP states
-  const [otpStep, setOtpStep] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [pendingUser, setPendingUser] = useState(null);
-
   const [loading, setLoading] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false); // حالة الكابتشا
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const clearError = (field) => {
     setErrors((previous) => {
@@ -54,33 +41,35 @@ function Login() {
     });
   };
 
-  // إرسال OTP
-  const sendOTP = async (userEmail) => {
-    const response = await fetch(`${OTP_API}/send-otp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        email: userEmail,
-      }),
-    });
+  const accountTypeFromRole = (role) =>
+    role === "owner" ? "مالك" : "مستأجر";
 
-    const data = await response.json();
+  // رسالة خطأ نوع الحساب
+  const roleMismatchMessage = (actualType) =>
+    isArabic
+      ? `هذا الحساب مسجل بصفة ${actualType || ""}`
+      : `This account is registered as ${actualType || "another account type"}.`;
 
-    if (!response.ok || !data.success) {
-      throw new Error(
-        data.message ||
-          (isArabic
-            ? "فشل إرسال كود التحقق."
-            : "Failed to send verification code.")
-      );
+  const handleAuthError = (error) => {
+    if (error?.code === "baytak/role-mismatch") {
+      setErrors({ role: roleMismatchMessage(error.actualType) });
+      return;
     }
 
-    return data;
+    if (
+      error?.code === "auth/invalid-credential" ||
+      error?.code === "auth/user-not-found" ||
+      error?.code === "auth/wrong-password"
+    ) {
+      setErrors({ general: t.incorrectCredentials });
+      return;
+    }
+
+    console.error("Login error:", error);
+    setErrors({ general: getAuthErrorMessage(error, isArabic) });
   };
 
-  // المرحلة الأولى: التحقق من بيانات الحساب
+  // تسجيل الدخول بالبريد وكلمة المرور (Firebase Auth)
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -100,7 +89,9 @@ function Login() {
     }
 
     if (!captchaVerified) {
-      newErrors.captcha = isArabic ? "يرجى تأكيد أنك لست روبوتاً." : "Please verify that you are not a robot.";
+      newErrors.captcha = isArabic
+        ? "يرجى تأكيد أنك لست روبوتاً."
+        : "Please verify that you are not a robot.";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -108,171 +99,29 @@ function Login() {
       return;
     }
 
-    const registeredUsers = getRegisteredUsers();
-
-    const registeredUser = registeredUsers.find(
-      (user) =>
-        user.email?.trim().toLowerCase() === normalizedEmail &&
-        user.password === password
-    );
-
-    if (!registeredUser) {
-      setErrors({
-        general: t.incorrectCredentials,
-      });
-      return;
-    }
-
-    const selectedAccountType =
-      selectedRole === "owner" ? "مالك" : "مستأجر";
-
-    if (registeredUser.accountType !== selectedAccountType) {
-      setErrors({
-        role: isArabic
-          ? `هذا الحساب مسجل بصفة ${
-              registeredUser.accountType || ""
-            }`
-          : `This account is registered as ${
-              registeredUser.accountType || "another account type"
-            }.`,
-      });
-      return;
-    }
-
-    const userWithId = {
-      ...registeredUser,
-      id: registeredUser.id || crypto.randomUUID(),
-      name: registeredUser.name || registeredUser.fullName || "",
-    };
-
     setLoading(true);
     setErrors({});
 
     try {
-      await sendOTP(normalizedEmail);
-
-      // حفظ الحساب مؤقتًا داخل React فقط
-      setPendingUser(userWithId);
-
-      // الانتقال لمرحلة OTP
-      setOtpStep(true);
-      setOtp("");
-      setCaptchaVerified(false);
-    } catch (error) {
-      setErrors({
-        general: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // المرحلة الثانية: التحقق من OTP
-  const handleVerifyOTP = async (event) => {
-    event.preventDefault();
-
-    if (!otp || otp.length !== 6) {
-      setErrors({
-        otp: isArabic
-          ? "أدخل كود التحقق المكوّن من 6 أرقام."
-          : "Enter the 6-digit verification code.",
-      });
-      return;
-    }
-
-    setLoading(true);
-    setErrors({});
-
-    try {
-      const response = await fetch(`${OTP_API}/verify-otp`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: pendingUser.email.trim().toLowerCase(),
-          code: otp,
-        }),
+      await login({
+        email: normalizedEmail,
+        password,
+        accountType: accountTypeFromRole(selectedRole),
+        staySignedIn,
       });
 
-      const data = await response.json();
-
-      if (!response.ok || !data.success || !data.verified) {
-        throw new Error(
-          data.message ||
-            (isArabic
-              ? "كود التحقق غير صحيح."
-              : "Invalid verification code.")
-        );
-      }
-
-      // نجاح OTP: تسجيل الدخول
-      const registeredUsers = getRegisteredUsers();
-
-      const updatedUsers = registeredUsers.map((user) =>
-        user.email?.trim().toLowerCase() ===
-        pendingUser.email.trim().toLowerCase()
-          ? pendingUser
-          : user
-      );
-
-      localStorage.setItem(
-        "baytakUsers",
-        JSON.stringify(updatedUsers)
-      );
-
-      localStorage.setItem(
-        "baytakUser",
-        JSON.stringify(pendingUser)
-      );
-
-      localStorage.setItem("baytakLoggedIn", "true");
-
-      localStorage.setItem(
-        "baytakStaySignedIn",
-        String(staySignedIn)
-      );
-
-      setErrors({});
       navigate("/home");
     } catch (error) {
-      setErrors({
-        otp: error.message,
-      });
+      handleAuthError(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // إعادة إرسال الكود
-  const handleResendOTP = async () => {
-    setLoading(true);
-    setErrors({});
-
-    try {
-      await sendOTP(pendingUser.email);
-      setOtp("");
-
-      setErrors({
-        otpSuccess: isArabic
-          ? "تم إرسال كود جديد إلى بريدك الإلكتروني."
-          : "A new code has been sent to your email.",
-      });
-    } catch (error) {
-      setErrors({
-        otp: error.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Google Login
+  // تسجيل الدخول بحساب Google
   const handleGoogleLogin = async () => {
     if (!selectedRole) {
-      setErrors({
-        role: t.chooseAccountType,
-      });
+      setErrors({ role: t.chooseAccountType });
       return;
     }
 
@@ -280,98 +129,21 @@ function Login() {
     setErrors({});
 
     try {
-      const result = await signInWithPopup(
-        auth,
-        googleProvider
-      );
+      await loginWithGoogle({
+        accountType: accountTypeFromRole(selectedRole),
+        staySignedIn,
+      });
 
-      const googleUser = result.user;
-      const normalizedEmail = googleUser.email
-        ?.trim()
-        .toLowerCase();
-
-      if (!normalizedEmail) {
-        throw new Error(
-          isArabic
-            ? "لم يتم الحصول على البريد الإلكتروني."
-            : "Google did not provide an email."
-        );
-      }
-
-      const selectedAccountType =
-        selectedRole === "owner" ? "مالك" : "مستأجر";
-
-      const registeredUsers = getRegisteredUsers();
-
-      const existingUser = registeredUsers.find(
-        (user) =>
-          user.email?.trim().toLowerCase() === normalizedEmail
-      );
-
-      // لو الحساب موجود بالفعل بنوع مختلف
+      navigate("/home");
+    } catch (error) {
       if (
-        existingUser &&
-        existingUser.accountType !== selectedAccountType
+        error?.code === "auth/popup-closed-by-user" ||
+        error?.code === "auth/cancelled-popup-request"
       ) {
-        await auth.signOut();
-
-        setErrors({
-          role: isArabic
-            ? `هذا الحساب مسجل بصفة ${existingUser.accountType}`
-            : `This account is registered as ${existingUser.accountType}.`,
-        });
-
         return;
       }
 
-      const baytakUser = {
-        ...(existingUser || {}),
-        id: existingUser?.id || googleUser.uid,
-        uid: googleUser.uid,
-        name:
-          existingUser?.name ||
-          googleUser.displayName ||
-          "",
-        email: normalizedEmail,
-        photoURL: googleUser.photoURL || "",
-        accountType: selectedAccountType,
-        authProvider: "google",
-      };
-
-      const updatedUsers = existingUser
-        ? registeredUsers.map((user) =>
-            user.email?.trim().toLowerCase() === normalizedEmail
-              ? baytakUser
-              : user
-          )
-        : [...registeredUsers, baytakUser];
-
-      localStorage.setItem(
-        "baytakUsers",
-        JSON.stringify(updatedUsers)
-      );
-
-      localStorage.setItem(
-        "baytakUser",
-        JSON.stringify(baytakUser)
-      );
-
-      localStorage.setItem("baytakLoggedIn", "true");
-
-      localStorage.setItem(
-        "baytakStaySignedIn",
-        String(staySignedIn)
-      );
-
-      navigate("/home");
-    } catch (error) {
-      console.error("Google login error:", error);
-
-      setErrors({
-        general: isArabic
-          ? "فشل تسجيل الدخول باستخدام Google."
-          : "Google sign-in failed.",
-      });
+      handleAuthError(error);
     } finally {
       setLoading(false);
     }
@@ -388,122 +160,13 @@ function Login() {
 
         <h1>Baytak</h1>
 
-        <h2>
-          {otpStep
-            ? isArabic
-              ? "التحقق من البريد الإلكتروني"
-              : "Email Verification"
-            : t.login}
-        </h2>
+        <h2>{t.login}</h2>
 
-        <p className="login-subtitle">
-          {otpStep
-            ? isArabic
-              ? `أرسلنا كود تحقق إلى ${pendingUser?.email}`
-              : `We sent a verification code to ${pendingUser?.email}`
-            : t.welcomeBack}
-        </p>
+        <p className="login-subtitle">{t.welcomeBack}</p>
 
-        {!otpStep && (
-          <p className="premium-text">
-            {t.premiumRealEstate}
-          </p>
-        )}
+        <p className="premium-text">{t.premiumRealEstate}</p>
       </div>
 
-      {/* OTP screen */}
-      {otpStep ? (
-        <form
-          className="login-card"
-          onSubmit={handleVerifyOTP}
-        >
-          {errors.general && (
-            <div className="error-text" role="alert">
-              {errors.general}
-            </div>
-          )}
-
-          {errors.otpSuccess && (
-            <div className="success-text" role="status">
-              {errors.otpSuccess}
-            </div>
-          )}
-
-          <div className="input-group">
-            <label htmlFor="login-otp">
-              {isArabic
-                ? "كود التحقق"
-                : "Verification Code"}
-            </label>
-
-            <input
-              id="login-otp"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              placeholder="000000"
-              value={otp}
-              onChange={(event) => {
-                const value = event.target.value
-                  .replace(/\D/g, "")
-                  .slice(0, 6);
-
-                setOtp(value);
-                clearError("otp");
-                clearError("otpSuccess");
-              }}
-            />
-
-            {errors.otp && (
-              <span className="error-text" role="alert">
-                {errors.otp}
-              </span>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="login-btn"
-            disabled={loading}
-          >
-            {loading
-              ? isArabic
-                ? "جارٍ التحقق..."
-                : "Verifying..."
-              : isArabic
-                ? "تأكيد الكود"
-                : "Verify Code"}
-          </button>
-
-          <button
-            type="button"
-            className="google-btn"
-            onClick={handleResendOTP}
-            disabled={loading}
-          >
-            {isArabic
-              ? "إعادة إرسال الكود"
-              : "Resend Code"}
-          </button>
-
-          <button
-            type="button"
-            className="google-btn"
-            onClick={() => {
-              setOtpStep(false);
-              setPendingUser(null);
-              setOtp("");
-              setErrors({});
-            }}
-          >
-            {isArabic
-              ? "العودة لتسجيل الدخول"
-              : "Back to Login"}
-          </button>
-        </form>
-      ) : (
-        // Login screen
         <form className="login-card" onSubmit={handleLogin}>
           {errors.general && (
             <div className="error-text" role="alert">
@@ -601,7 +264,7 @@ function Login() {
           <div style={{ margin: "15px 0", display: "flex", justifyContent: "center" }}>
             <ReCAPTCHA
               sitekey="6LdDHCIuAAAAAKESaC0_FH_twfDhlOaXIwaiZ7S2"
-              theme="dark"
+              theme="light"
               onChange={(value) => {
                 if (value) setCaptchaVerified(true);
               }}
@@ -617,8 +280,8 @@ function Login() {
           >
             {loading
               ? isArabic
-                ? "جارٍ إرسال الكود..."
-                : "Sending code..."
+                ? "جارٍ تسجيل الدخول..."
+                : "Signing in..."
               : t.loginArrow ||
                 (isArabic
                   ? "تسجيل الدخول ←"
@@ -701,7 +364,6 @@ function Login() {
             <Link to="/register">{t.signUp}</Link>
           </p>
         </form>
-      )}
     </div>
   );
 }

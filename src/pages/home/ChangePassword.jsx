@@ -8,6 +8,12 @@ import {
 } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import {
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+} from "firebase/auth";
+import { auth } from "../../firebase/firebase.js";
 import "../../styles/ChangePassword.css";
 
 function ChangePassword() {
@@ -36,59 +42,80 @@ function ChangePassword() {
     passwordRules.number &&
     passwordRules.special;
 
-  const handleSavePassword = () => {
-  // 1️⃣ التأكد إن كل الخانات متملية
-  if (
-    !currentPassword.trim() ||
-    !newPassword.trim() ||
-    !confirmPassword.trim()
-  ) {
-    alert(t.fillRequiredFields);
-    return;
-  }
+  const handleSavePassword = async () => {
+    // 1️⃣ التأكد إن كل الخانات متملية
+    if (
+      !currentPassword.trim() ||
+      !newPassword.trim() ||
+      !confirmPassword.trim()
+    ) {
+      alert(t.fillRequiredFields);
+      return;
+    }
 
-  // 2️⃣ جلب كلمة المرور الحالية المحفوظة
-  const savedPassword = localStorage.getItem("baytakPassword");
+    // 2️⃣ شروط كلمة المرور الجديدة
+    if (!allRulesPassed) {
+      alert("كلمة المرور الجديدة لا تستوفي جميع الشروط.");
+      return;
+    }
 
-  // لو مفيش باسورد محفوظ
-  if (!savedPassword) {
-    alert(t.currentPasswordNotFound);
-    return;
-  }
+    // 3️⃣ تطابق كلمة المرور الجديدة
+    if (newPassword !== confirmPassword) {
+      alert(t.passwordConfirmationMismatch);
+      return;
+    }
 
-  // 3️⃣ التأكد من أن كلمة المرور الحالية صحيحة
-  if (currentPassword !== savedPassword) {
-    alert(t.currentPasswordIncorrect);
-    return;
-  }
+    const currentUser = auth.currentUser;
 
-  // 4️⃣ التأكد من شروط كلمة المرور الجديدة
-  if (!allRulesPassed) {
-    alert(
-      "كلمة المرور الجديدة لا تستوفي جميع الشروط."
+    if (!currentUser || !currentUser.email) {
+      alert(t.currentPasswordNotFound);
+      return;
+    }
+
+    // حسابات Google ليس لها كلمة مرور داخل الموقع
+    const usesPassword = currentUser.providerData.some(
+      (provider) => provider.providerId === "password"
     );
-    return;
-  }
 
-  // 5️⃣ التأكد من تطابق كلمة المرور الجديدة
-  if (newPassword !== confirmPassword) {
-    alert(t.passwordConfirmationMismatch);
-    return;
-  }
+    if (!usesPassword) {
+      alert(
+        "هذا الحساب مسجل بواسطة Google، لذلك لا توجد له كلمة مرور لتغييرها."
+      );
+      return;
+    }
 
-  // 6️⃣ حفظ كلمة المرور الجديدة
-  localStorage.setItem(
-    "baytakPassword",
-    newPassword
-  );
+    try {
+      // 4️⃣ التحقق من كلمة المرور الحالية عن طريق Firebase
+      const credential = EmailAuthProvider.credential(
+        currentUser.email,
+        currentPassword
+      );
 
-  // 7️⃣ الانتقال لصفحة النجاح
-  navigate("/password-changed", {
-    state: {
-      from: "settings",
-    },
-  });
-};
+      await reauthenticateWithCredential(currentUser, credential);
+
+      // 5️⃣ حفظ كلمة المرور الجديدة
+      await updatePassword(currentUser, newPassword);
+
+      navigate("/password-changed", {
+        state: {
+          from: "settings",
+        },
+      });
+    } catch (error) {
+      console.error("Change password error:", error);
+
+      if (
+        error?.code === "auth/invalid-credential" ||
+        error?.code === "auth/wrong-password"
+      ) {
+        alert(t.currentPasswordIncorrect);
+      } else if (error?.code === "auth/too-many-requests") {
+        alert("محاولات كثيرة. حاول مرة أخرى بعد قليل.");
+      } else {
+        alert(t.somethingWentWrongTryAgain);
+      }
+    }
+  };
 
   const Rule = ({ passed, children }) => {
     return (

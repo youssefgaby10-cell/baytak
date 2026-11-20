@@ -52,7 +52,7 @@ function RecommendationList({ properties = [], searchTerm = "", activeFilter, ac
               key={property.id}
               className="recommend-card"
               onClick={() =>
-                navigate("/property-details", {
+                navigate(`/property/${property.id}`, {
                   state: property,
                 })
               }

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { compressImageFile, dataUrlBytes } from "../../utils/imageCompress.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { 
   FaArrowLeft,
@@ -210,16 +211,9 @@ function getCities(governorate) {
   return Array.isArray(cities) ? cities : [];
 }
 
+// يصغّر الصورة ويضغطها قبل الحفظ (Firestore: الحد الأقصى للـ document هو 1MB)
 function readImage(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === "string") resolve(reader.result);
-      else reject(new Error("Invalid image data"));
-    };
-    reader.onerror = () => reject(new Error("Image could not be read"));
-    reader.readAsDataURL(file);
-  });
+  return compressImageFile(file);
 }
 
 function normalizeListingType(value) {
@@ -450,8 +444,6 @@ export default function AddProperty() {
       const now = new Date().toISOString();
       const property = {
         id: typeof crypto !== "undefined" && typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `property-${Date.now()}`,
-        userId: currentUser?.id || currentUser?.email || "anonymous",
-        ownerEmail: currentUser?.email || "",
         title: formData.title.trim(),
         price: Number(formData.price),
         governorate: formData.governorate,
@@ -472,7 +464,28 @@ export default function AddProperty() {
         updatedAt: now,
       };
 
-      await Promise.resolve(addProperty(property));
+      const totalImageBytes = property.images.reduce(
+        (sum, image) => sum + dataUrlBytes(image),
+        0
+      );
+
+      // image هي نفس أول صورة، فبتتحسب مرتين داخل الـ document
+      if (totalImageBytes + dataUrlBytes(property.image) > 900 * 1024) {
+        if (isMountedRef.current) {
+          setErrors({
+            images:
+              "حجم الصور كبير. قلّل عدد الصور (يفضّل 6 أو أقل) وحاول مرة أخرى.",
+          });
+        }
+        return;
+      }
+
+      const result = await addProperty(property);
+
+      if (!result?.success) {
+        throw new Error(result?.message || "addProperty failed");
+      }
+
       if (!isMountedRef.current) return;
       
       // مسح المسودة بعد الحفظ الناجح

@@ -127,7 +127,7 @@ function FeaturedCard({
             className="details-btn"
             onClick={() =>
               navigate(
-                "/property-details",
+                `/property/${property.id}`,
                 {
                   state: property,
                 }

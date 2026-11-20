@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaMapMarkerAlt,
@@ -18,14 +18,17 @@ import {
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import "../../styles/PropertyDetails.css";
 import { useProperties } from "../../context/PropertyContext";
+import { useSeo } from "../../utils/useSeo.js";
 
 function PropertyDetails() {
   const { t } = useLanguage();
   const navigate = useNavigate();
-  const { state: property } = useLocation();
+  const { id: routeId } = useParams();
+  const { state: routeState } = useLocation();
 
   const {
     properties,
+    loading,
     toggleFavorite,
     addViewingRequest,
   } = useProperties();
@@ -35,21 +38,67 @@ function PropertyDetails() {
   const [requestMessage, setRequestMessage] = useState("");
   const [requestSuccess, setRequestSuccess] = useState(false);
 
-  if (!property) {
+  // الرابط /property/:id هو المصدر الأساسي، وlocation.state احتياطي (الرابط القديم)
+  const wantedId = routeId ?? routeState?.id;
+
+  const currentProperty =
+    (wantedId !== undefined &&
+      properties?.find((item) => String(item.id) === String(wantedId))) ||
+    routeState ||
+    null;
+
+  const seoDescription = currentProperty
+    ? [
+        currentProperty.type,
+        currentProperty.listingType === "rent" ? "للإيجار" : "للبيع",
+        currentProperty.location || currentProperty.city
+          ? `في ${currentProperty.location || currentProperty.city}`
+          : "",
+        currentProperty.area ? `- ${currentProperty.area} م²` : "",
+        currentProperty.rooms ? `- ${currentProperty.rooms} غرف` : "",
+        currentProperty.price ? `- السعر ${currentProperty.price} جنيه` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .slice(0, 155)
+    : "";
+
+  useSeo(
+    currentProperty
+      ? {
+          title: `${currentProperty.title} | Baytak`,
+          description:
+            seoDescription ||
+            currentProperty.description?.slice(0, 155) ||
+            "تفاصيل العقار على Baytak",
+          image: currentProperty.image,
+          type: "article",
+        }
+      : {
+          title: "عقار | Baytak",
+          description: "تفاصيل العقار على Baytak",
+          noindex: true,
+        }
+  );
+
+  if (!currentProperty) {
+    if (loading) {
+      return (
+        <div className="property-not-found">
+          <h2>...</h2>
+        </div>
+      );
+    }
+
     return (
       <div className="property-not-found">
         <h2>{t.noPropertyData}</h2>
-        <button onClick={() => navigate("/home")}>
+        <button onClick={() => navigate("/")}>
           {t.backToHome}
         </button>
       </div>
     );
   }
-
-  const currentProperty =
-    properties.find(
-      (item) => String(item.id) === String(property.id)
-    ) || property;
 
   const user = (() => {
     try {
@@ -66,6 +115,11 @@ function PropertyDetails() {
   const submitViewingRequest = () => {
     setRequestMessage("");
     setRequestSuccess(false);
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
 
     if (!isTenant) {
       setRequestMessage(

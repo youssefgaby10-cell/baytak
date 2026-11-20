@@ -12,8 +12,14 @@ import RecommendationList from "../../components/home/RecommendationList";
 import BottomNavigation from "../../components/home/BottomNavigation";
 import SearchResults from "../../components/home/SearchResults";
 import { useProperties } from "../../context/PropertyContext";
+import { useSeo } from "../../utils/useSeo.js";
 
 function Home() {
+  useSeo({
+    title: "Baytak | بيتك - عقارات وشقق للبيع والإيجار في مصر",
+    description:
+      "ابحث في Baytak عن شقق وفيلات ومحلات ومكاتب وأراضي للبيع والإيجار في مصر، أو انشر عقارك واعرضه على آلاف الباحثين.",
+  });
   const navigate = useNavigate();
 
   const [searchTerm, setSearchTerm] = useState("");

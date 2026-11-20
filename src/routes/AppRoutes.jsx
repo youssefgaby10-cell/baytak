@@ -1,41 +1,41 @@
 
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./ProtectedRoute";
 
-import Onboarding1 from "../pages/auth/Onboarding1";
-import Onboarding2 from "../pages/auth/Onboarding2";
-import Onboarding3 from "../pages/auth/Onboarding3";
-import Login from "../pages/auth/Login";
-import Register from "../pages/auth/Register";
-import ForgotPassword from "../pages/auth/ForgotPassword";
-import OTP from "../pages/auth/OTP";
-import ResetPassword from "../pages/auth/ResetPassword";
-import PasswordChanged from "../pages/auth/PasswordChanged";
+const Onboarding1 = lazy(() => import("../pages/auth/Onboarding1"));
+const Onboarding2 = lazy(() => import("../pages/auth/Onboarding2"));
+const Onboarding3 = lazy(() => import("../pages/auth/Onboarding3"));
+const Login = lazy(() => import("../pages/auth/Login"));
+const Register = lazy(() => import("../pages/auth/Register"));
+const ForgotPassword = lazy(() => import("../pages/auth/ForgotPassword"));
+const PasswordChanged = lazy(() => import("../pages/auth/PasswordChanged"));
 
 import Home from "../pages/home/Home";
-import Search from "../pages/home/Search";
-import Favorites from "../pages/home/Favorites";
-import Settings from "../pages/home/Settings";
-import EditProfile from "../pages/home/EditProfile";
-import ChangePassword from "../pages/home/ChangePassword";
-import ChangePhoneNumber from "../pages/home/ChangePhoneNumber";
-import ChangeEmail from "../pages/home/ChangeEmail";
-import Language from "../pages/home/Language";
-import Help from "../pages/home/Help";
-import PrivacyPolicy from "../pages/home/PrivacyPolicy";
-import ContactUs from "../pages/home/ContactUs";
-import AboutApp from "../pages/home/AboutApp";
-import Notifications from "../pages/home/Notifications";
+import NotFound from "../pages/errors/NotFound";
+const Search = lazy(() => import("../pages/home/Search"));
+const Favorites = lazy(() => import("../pages/home/Favorites"));
+const Settings = lazy(() => import("../pages/home/Settings"));
+const EditProfile = lazy(() => import("../pages/home/EditProfile"));
+const ChangePassword = lazy(() => import("../pages/home/ChangePassword"));
+const ChangePhoneNumber = lazy(() => import("../pages/home/ChangePhoneNumber"));
+const ChangeEmail = lazy(() => import("../pages/home/ChangeEmail"));
+const Language = lazy(() => import("../pages/home/Language"));
+const Help = lazy(() => import("../pages/home/Help"));
+const PrivacyPolicy = lazy(() => import("../pages/home/PrivacyPolicy"));
+const ContactUs = lazy(() => import("../pages/home/ContactUs"));
+const AboutApp = lazy(() => import("../pages/home/AboutApp"));
+const Notifications = lazy(() => import("../pages/home/Notifications"));
 
-import Profile from "../pages/profile/Profile";
-import MyProperties from "../pages/owner/MyProperties";
+const Profile = lazy(() => import("../pages/profile/Profile"));
+const MyProperties = lazy(() => import("../pages/owner/MyProperties"));
 
-import AddProperty from "../pages/property/AddProperty";
-import EditProperty from "../pages/property/EditProperty";
-import PropertyDetails from "../pages/property/PropertyDetails";
-import LocationMap from "../pages/property/LocationMap";
-import OwnerViewingRequests from "../pages/owner/OwnerViewingRequests";
-import MyRequests from "../pages/tenant/MyRequests";
+const AddProperty = lazy(() => import("../pages/property/AddProperty"));
+const EditProperty = lazy(() => import("../pages/property/EditProperty"));
+const PropertyDetails = lazy(() => import("../pages/property/PropertyDetails"));
+const LocationMap = lazy(() => import("../pages/property/LocationMap"));
+const OwnerViewingRequests = lazy(() => import("../pages/owner/OwnerViewingRequests"));
+const MyRequests = lazy(() => import("../pages/tenant/MyRequests"));
 const OWNER_ROLES = ["owner"];
 const TENANT_ROLES = ["tenant"];
 
@@ -48,9 +48,27 @@ function AppRoutes() {
 
   return (
     <BrowserRouter>
+      <Suspense
+        fallback={
+          <div
+            style={{
+              minHeight: "100vh",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#666",
+            }}
+          >
+            ...
+          </div>
+        }
+      >
       <Routes>
+        {/* الصفحة الرئيسية عامة (مفتوحة للزوار وجوجل) */}
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+
         {/* Onboarding */}
-        <Route path="/" element={<Navigate to="/onboarding1" replace />} />
         <Route path="/onboarding1" element={<Onboarding1 />} />
         <Route path="/onboarding2" element={<Onboarding2 />} />
         <Route path="/onboarding3" element={<Onboarding3 />} />
@@ -59,13 +77,16 @@ function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-otp" element={<OTP />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+        {/* إعادة تعيين كلمة المرور تتم الآن عبر رابط يرسله Firebase للبريد */}
+        <Route path="/verify-otp" element={<Navigate to="/forgot-password" replace />} />
+        <Route path="/reset-password" element={<Navigate to="/forgot-password" replace />} />
         <Route path="/password-changed" element={<PasswordChanged />} />
 
         {/* Pages available to both account types */}
-        <Route path="/home" element={protectedPage(Home)} />   <Route path="/search" element={protectedPage(Search)} />
-        <Route path="/property-details" element={protectedPage(PropertyDetails)} />
+        {/* صفحات عامة: البحث وتفاصيل العقار */}
+        <Route path="/search" element={<Search />} />
+        <Route path="/property/:id" element={<PropertyDetails />} />
+        <Route path="/property-details" element={<PropertyDetails />} />
         <Route path="/favorites" element={protectedPage(Favorites)} />
         <Route path="/notifications" element={protectedPage(Notifications)} />
 
@@ -111,9 +132,10 @@ function AppRoutes() {
         />
 
         {/* Unknown routes */}
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="*" element={<NotFound />} />
         
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

@@ -18,16 +18,13 @@ function MyProperties() {
     currentUser = null;
   }
 
-  const currentUserId = currentUser?.id || currentUser?.uid || currentUser?.email || "";
-  const currentUserEmail = currentUser?.email || "";
+  const currentUserId = currentUser?.uid || currentUser?.id || "";
 
-  // فلترة العقارات لتظهر عقارات المستخدم الحالي فقط
-  const myProperties = properties.filter((property) => {
-    return (
-      (currentUserId && String(property.userId) === String(currentUserId)) ||
-      (currentUserEmail && property.ownerEmail === currentUserEmail)
-    );
-  });
+  // فلترة العقارات لتظهر عقارات المستخدم الحالي فقط (حسب ownerId)
+  const myProperties = properties.filter(
+    (property) =>
+      currentUserId && String(property.ownerId) === String(currentUserId)
+  );
 
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(t.deletePropertyConfirm);

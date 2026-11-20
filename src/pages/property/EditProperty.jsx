@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { compressImageFile } from "../../utils/imageCompress.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useProperties } from "../../context/PropertyContext";
 
@@ -275,21 +276,13 @@ function EditProperty() {
 
     const readers = imageFiles.map(
       (file) =>
-        new Promise((resolve) => {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            resolve({
-              id: `${file.name}-${file.lastModified}-${Math.random()}`,
-              src: reader.result,
-              name: file.name,
-            });
-          };
-
-          reader.onerror = () => resolve(null);
-
-          reader.readAsDataURL(file);
-        })
+        compressImageFile(file)
+          .then((src) => ({
+            id: `${file.name}-${file.lastModified}-${Math.random()}`,
+            src,
+            name: file.name,
+          }))
+          .catch(() => null)
     );
 
     Promise.all(readers).then((results) => {

@@ -1,25 +1,39 @@
-import { GoogleGenAI } from "@google/genai";
+import { auth } from "../firebase/firebase.js";
 
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
+// يحوّل جملة البحث لكلمات مفتاحية عن طريق /api/ai-search (على السيرفر).
+// أي مشكلة (زائر غير مسجل، السيرفر غير متاح...) يرجع الجملة الأصلية ببحث عادي.
 export async function parseSearchWithAI(userQuery) {
-  try {
-    const prompt = `
-أنت مساعد عقاري لموقع "بيتَك". حول جملة البحث التالية إلى كلمات مفتاحية قصيرة جداً ومباشرة للبحث في قاعدة البيانات (حول الأرقام المكتوبة بالحروف إلى أرقام مثل: تلات -> 3، واحذف كلمات مثل: للبيع، للإيجار، بسعر أقل من، مليون، غرف).
-مثال: "شقة للبيع في مدينة نصر تلات غرف" -> "شقة مدينة نصر 3"
-مثال: "فيلا للبيع في التجمع الخامس" -> "فيلا التجمع الخامس"
-أرجع الكلمات المفتاحية فقط بدون أي علامات أو شرح.
-الجملة: "${userQuery}"
-`;
+  const query = String(userQuery ?? "").trim();
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
+  if (!query) return userQuery;
+
+  const user = auth.currentUser;
+
+  // الزائر غير المسجل يستخدم البحث العادي
+  if (!user) return userQuery;
+
+  try {
+    const token = await user.getIdToken();
+
+    const response = await fetch("/api/ai-search", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ query }),
     });
 
-    return response.text.trim();
+    if (!response.ok) {
+      throw new Error(`AI search responded with ${response.status}`);
+    }
+
+    const data = await response.json();
+    const keywords = String(data?.keywords ?? "").trim();
+
+    return keywords || userQuery;
   } catch (error) {
-    console.error("خطأ في الذكاء الاصطناعي:", error);
+    console.error("خطأ في البحث الذكي:", error);
     return userQuery; // لو حصل خطأ يرجع الكلمة الأصلية عادي
   }
 }

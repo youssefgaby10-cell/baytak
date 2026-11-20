@@ -1,38 +1,46 @@
 import { Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import { useSeo } from "../utils/useSeo.js";
+
+const ROLE_MAP = {
+  owner: "مالك",
+  tenant: "مستأجر",
+};
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const isLoggedIn =
-    localStorage.getItem("baytakLoggedIn") === "true";
+  const { loading, user, profile } = useAuth();
 
-  if (!isLoggedIn) {
+  // الصفحات الخاصة (بعد تسجيل الدخول) لا تُفهرس في جوجل
+  useSeo({ noindex: true });
+
+  // ننتظر Firebase يرجّع حالة الجلسة قبل أي قرار
+  if (loading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontFamily: "sans-serif",
+          color: "#666",
+        }}
+      >
+        ...
+      </div>
+    );
+  }
+
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles?.length) {
-    let user;
-
-    try {
-      user = JSON.parse(
-        localStorage.getItem("baytakUser") || "null"
-      );
-    } catch {
-      user = null;
-    }
-
-    if (!user) {
-      return <Navigate to="/login" replace />;
-    }
-
-    const roleMap = {
-      owner: "مالك",
-      tenant: "مستأجر",
-    };
-
     const allowedAccountTypes = allowedRoles.map(
-      (role) => roleMap[role] || role
+      (role) => ROLE_MAP[role] || role
     );
 
-    if (!allowedAccountTypes.includes(user.accountType)) {
+    if (!allowedAccountTypes.includes(profile?.accountType)) {
       return <Navigate to="/home" replace />;
     }
   }

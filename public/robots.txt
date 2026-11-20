@@ -1,4 +1,19 @@
 User-agent: *
 Allow: /
 
+# صفحات خاصة بالمستخدم المسجل
+Disallow: /settings
+Disallow: /profile
+Disallow: /edit-profile
+Disallow: /change-
+Disallow: /favorites
+Disallow: /notifications
+Disallow: /my-properties
+Disallow: /my-requests
+Disallow: /owner-viewing-requests
+Disallow: /add-property
+Disallow: /edit-property
+Disallow: /select-location
+Disallow: /api/
+
 Sitemap: https://baytak-7di4.vercel.app/sitemap.xml

@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { verifyBeforeUpdateEmail } from "firebase/auth";
+import { auth } from "../../firebase/firebase.js";
 import "../../styles/ChangeEmail.css";
 
 function ChangeEmail() {
@@ -35,7 +37,7 @@ function ChangeEmail() {
     }
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setError("");
 
     const oldEmail = currentEmail.trim().toLowerCase();
@@ -68,39 +70,37 @@ function ChangeEmail() {
       return;
     }
 
-    const savedUser =
-      localStorage.getItem("baytakUser");
+    const currentUser = auth.currentUser;
 
-    let user = {};
-
-    if (savedUser) {
-      try {
-        user = JSON.parse(savedUser);
-      } catch (error) {
-        console.error(
-          "Error reading user data:",
-          error
-        );
-      }
+    if (!currentUser) {
+      setError("سجّل الدخول مرة أخرى ثم أعد المحاولة.");
+      return;
     }
 
-    const updatedUser = {
-      ...user,
-      email: cleanNewEmail,
-    };
+    try {
+      // Firebase يرسل رابط تأكيد للبريد الجديد، ولا يتغير البريد إلا بعد الضغط عليه
+      await verifyBeforeUpdateEmail(currentUser, cleanNewEmail);
 
-    localStorage.setItem(
-      "baytakUser",
-      JSON.stringify(updatedUser)
-    );
+      alert(
+        "أرسلنا رابط تأكيد إلى البريد الجديد. اضغط عليه لإتمام التغيير، ثم سجّل الدخول من جديد."
+      );
 
-    // للتوافق مع أي كود قديم يستخدم هذا المفتاح
-    localStorage.setItem(
-      "baytakEmail",
-      cleanNewEmail
-    );
+      navigate("/settings");
+    } catch (err) {
+      console.error("Change email error:", err);
 
-    navigate("/settings");
+      if (err?.code === "auth/requires-recent-login") {
+        setError(
+          "لأسباب أمنية، سجّل الخروج ثم سجّل الدخول مرة أخرى وأعد المحاولة."
+        );
+      } else if (err?.code === "auth/email-already-in-use") {
+        setError("هذا البريد مستخدم بالفعل في حساب آخر.");
+      } else if (err?.code === "auth/invalid-email") {
+        setError("من فضلك أدخل بريدًا إلكترونيًا صحيحًا.");
+      } else {
+        setError("حدث خطأ. حاول مرة أخرى.");
+      }
+    }
   };
 
   return (

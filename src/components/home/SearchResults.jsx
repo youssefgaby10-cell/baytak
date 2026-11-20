@@ -100,7 +100,7 @@ function SearchResults({
             key={property.id}
             className="recommend-card search-card"
             onClick={() =>
-              navigate("/property-details", { state: property })
+              navigate(`/property/${property.id}`, { state: property })
             }
           >
             <img

@@ -92,7 +92,7 @@ function PropertyCard({
   <button
     className="view-btn"
     onClick={() =>
-      navigate("/property-details", {
+      navigate(`/property/${property.id}`, {
         state: property,
       })
     }

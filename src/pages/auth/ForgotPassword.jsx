@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaEnvelope } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../firebase/firebase.js";
 import "../../styles/ForgotPassword.css";
 
 function ForgotPassword() {
@@ -12,109 +14,45 @@ function ForgotPassword() {
 
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSendCode = () => {
+  const handleSendCode = async () => {
     setError("");
-
-    /* =========================
-       Validate Email
-    ========================= */
+    setSuccess("");
 
     if (!email.trim()) {
       setError(t.pleaseEnterEmail);
       return;
     }
 
-    /* =========================
-       Get Registered User
-    ========================= */
-
-    const savedUser =
-      localStorage.getItem("baytakUser");
-
-    if (!savedUser) {
-      setError(
-        t.noAccountFound
-      );
-      return;
-    }
-
-    let user;
-
-    try {
-      user = JSON.parse(savedUser);
-    } catch (error) {
-      console.error(
-        "Error reading user data:",
-        error
-      );
-
-      setError(
-        t.somethingWentWrongTryAgain
-      );
-
-      return;
-    }
-
-    /* =========================
-       Check Email
-    ========================= */
-
-    if (
-      user.email.toLowerCase() !==
-      email.trim().toLowerCase()
-    ) {
-      setError(
-        "This email is not registered."
-      );
-
-      return;
-    }
-
-    /* =========================
-       Generate OTP
-       
-       IMPORTANT:
-       This is a temporary frontend
-       OTP until we connect a real
-       email service/backend.
-    ========================= */
-
-    const otp =
-      Math.floor(
-        100000 + Math.random() * 900000
-      ).toString();
-
-    sessionStorage.setItem(
-      "baytakResetEmail",
-      email.trim().toLowerCase()
-    );
-
-    sessionStorage.setItem(
-      "baytakResetOTP",
-      otp
-    );
-
     setLoading(true);
 
-    /*
-      Temporary development behavior.
-
-      In the real version, this OTP will be
-      sent to the user's email through the backend.
-    */
-
-    setTimeout(() => {
-      setLoading(false);
-
-      console.log(
-        "Baytak Reset OTP:",
-        otp
+    try {
+      await sendPasswordResetEmail(
+        auth,
+        email.trim().toLowerCase()
       );
 
-      navigate("/verify-otp");
-    }, 800);
+      // Firebase لا يكشف إن كان البريد مسجلاً أم لا (حماية من تخمين الحسابات)
+      setSuccess(
+        "لو كان هذا البريد مسجلاً لدينا، فقد أرسلنا إليه رابط إعادة تعيين كلمة المرور. راجع صندوق الوارد (وأيضاً Spam)."
+      );
+    } catch (err) {
+      console.error("Password reset error:", err);
+
+      if (err?.code === "auth/invalid-email") {
+        setError("البريد الإلكتروني غير صالح.");
+      } else if (err?.code === "auth/too-many-requests") {
+        setError("محاولات كثيرة. حاول مرة أخرى بعد قليل.");
+      } else if (err?.code === "auth/network-request-failed") {
+        setError("تعذر الاتصال بالإنترنت. حاول مرة أخرى.");
+      } else {
+        setError(t.somethingWentWrongTryAgain);
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -187,6 +125,16 @@ function ForgotPassword() {
           </div>
         )}
 
+        {success && (
+          <div
+            className="forgot-error"
+            style={{ color: "#16a34a" }}
+            role="status"
+          >
+            {success}
+          </div>
+        )}
+
         {/* Send Code */}
 
         <button
@@ -195,8 +143,8 @@ function ForgotPassword() {
           disabled={loading}
         >
           {loading
-            ? "جاري التحقق..."
-            : "إرسال رمز التحقق"}
+            ? "جاري الإرسال..."
+            : "إرسال رابط إعادة التعيين"}
         </button>
 
         {/* Back Login */}

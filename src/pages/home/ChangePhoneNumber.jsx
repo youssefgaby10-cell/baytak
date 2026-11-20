@@ -10,10 +10,12 @@ import {
 } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
 import "../../styles/ChangePhoneNumber.css";
 
 function ChangePhoneNumber() {
   const { t } = useLanguage();
+  const { updateUserProfile } = useAuth();
 
   const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ function ChangePhoneNumber() {
     }
   }, []);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     setError("");
 
     const cleanCurrentPhone =
@@ -80,44 +82,13 @@ function ChangePhoneNumber() {
       return;
     }
 
-    /* Load current user */
-
-    const savedUser =
-      localStorage.getItem("baytakUser");
-
-    let user = {};
-
-    if (savedUser) {
-      try {
-        user = JSON.parse(savedUser);
-      } catch (error) {
-        console.error(
-          "Error reading user data:",
-          error
-        );
-      }
+    try {
+      await updateUserProfile({ phone: cleanNewPhone });
+      navigate("/settings");
+    } catch (err) {
+      console.error("Error saving phone number:", err);
+      setError("حدث خطأ أثناء حفظ رقم الهاتف. حاول مرة أخرى.");
     }
-
-    /* Update user */
-
-    const updatedUser = {
-      ...user,
-      phone: cleanNewPhone,
-    };
-
-    localStorage.setItem(
-      "baytakUser",
-      JSON.stringify(updatedUser)
-    );
-
-    /* Keep compatibility with old code */
-
-    localStorage.setItem(
-      "baytakPhone",
-      cleanNewPhone
-    );
-
-    navigate("/settings");
   };
 
   return (
