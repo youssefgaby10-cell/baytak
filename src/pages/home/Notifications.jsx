@@ -69,7 +69,7 @@ function Notifications() {
 
       case "viewing_cancelled":
         return {
-          heading: isArabic ? "تم إلغاء طلب معاينة" : "Viewing request cancelled",
+          heading: isArabic ? "تم إلغاء طلب المعاينة" : "Viewing request cancelled",
           text: isArabic
             ? `${actor} ألغى طلب معاينة "${title}".`
             : `${actor} cancelled the viewing request for "${title}".`,
@@ -97,6 +97,9 @@ function Notifications() {
       <header className="notifications-header">
         <button type="button" onClick={() => navigate(-1)} aria-label={isArabic ? "رجوع" : "Back"}>
           <FaArrowLeft style={{ transform: isArabic ? "none" : "scaleX(-1)" }} />
+        </button>
+        <button type="button" onClick={() => navigate("/")} aria-label={isArabic ? "الرئيسية" : "Home"}>
+          {isArabic ? "الرئيسية" : "Home"}
         </button>
         <h1>
           {t.notificationsTitle || (isArabic ? "الإشعارات" : "Notifications")}
