@@ -8,6 +8,7 @@ import {
   FaHourglassHalf,
   FaBan,
   FaInbox,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { useProperties } from "../../context/PropertyContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -24,6 +25,15 @@ function MyRequests() {
   const { language } = useLanguage();
   const isArabic = language === "ar";
   const navigate = useNavigate();
+
+  // يرجع للصفحة السابقة (مثلاً الإشعارات)، ولو الصفحة اتفتحت مباشرة يرجع للرئيسية
+  const goBack = () => {
+    if (window.history.state?.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/home");
+    }
+  };
   const [message, setMessage] = useState("");
   const [refresh, setRefresh] = useState(0);
 
@@ -106,9 +116,9 @@ function MyRequests() {
         <button
   type="button"
   className="my-requests-back-btn"
-  onClick={() => navigate("/home")}
+  onClick={goBack}
 >
-  <FaArrowRight />
+  {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
   {isArabic ? "رجوع" : "Back"}
 </button>
       <header className="my-requests-header">

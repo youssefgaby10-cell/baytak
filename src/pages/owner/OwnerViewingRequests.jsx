@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaCalendarAlt,
   FaCheck,
@@ -7,6 +8,8 @@ import {
   FaClock,
   FaMapMarkerAlt,
   FaInbox,
+  FaArrowLeft,
+  FaArrowRight,
 } from "react-icons/fa";
 import { useProperties } from "../../context/PropertyContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -20,6 +23,16 @@ function OwnerViewingRequests() {
 
   const { language } = useLanguage();
   const isArabic = language === "ar";
+  const navigate = useNavigate();
+
+  // يرجع للصفحة السابقة (مثلاً الإشعارات)، ولو الصفحة اتفتحت مباشرة يرجع للرئيسية
+  const goBack = () => {
+    if (window.history.state?.idx > 0) {
+      navigate(-1);
+    } else {
+      navigate("/home");
+    }
+  };
 
   const [refresh, setRefresh] = useState(0);
   const [message, setMessage] = useState("");
@@ -83,6 +96,11 @@ function OwnerViewingRequests() {
       dir={isArabic ? "rtl" : "ltr"}
       key={refresh}
     >
+      <button type="button" className="viewing-back-btn" onClick={goBack}>
+        {isArabic ? <FaArrowRight /> : <FaArrowLeft />}
+        {isArabic ? "رجوع" : "Back"}
+      </button>
+
       <header className="viewing-page-header">
         <div className="viewing-header-icon">
           <FaCalendarAlt />

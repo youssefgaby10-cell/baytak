@@ -307,3 +307,35 @@ html.dark-mode .google-btn {
 html.dark-mode .google-btn:hover {
   background: #262c3b;
 }
+
+/* ===========================
+   Viewing requests pages (dark mode)
+=========================== */
+
+html.dark-mode .owner-viewing-page,
+html.dark-mode .my-requests-page {
+  color: #e5e7eb;
+}
+
+html.dark-mode .viewing-page-header h1,
+html.dark-mode .my-requests-header h1 {
+  color: #f1f5f9;
+}
+
+html.dark-mode .viewing-page-header p,
+html.dark-mode .my-requests-header p {
+  color: #aab4c5;
+}
+
+html.dark-mode .viewing-back-btn,
+html.dark-mode .my-requests-back-btn {
+  background: #1c2130;
+  border-color: #2f3647;
+  color: #4ade80;
+}
+
+html.dark-mode .viewing-back-btn:hover,
+html.dark-mode .my-requests-back-btn:hover {
+  background: #262c3b;
+  border-color: #4ade80;
+}

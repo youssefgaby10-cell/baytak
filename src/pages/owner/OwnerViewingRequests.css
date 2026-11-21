@@ -236,3 +236,28 @@
     width: 100%;
   }
 }
+
+.viewing-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  padding: 11px 18px;
+  border: 1px solid #dce5e0;
+  border-radius: 10px;
+  background: #fff;
+  color: #16845b;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.viewing-back-btn:hover {
+  background: #e4f4eb;
+  border-color: #16845b;
+}
+
+.viewing-back-btn svg {
+  font-size: 14px;
+}
