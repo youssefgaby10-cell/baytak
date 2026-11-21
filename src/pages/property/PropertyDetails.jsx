@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -112,7 +112,11 @@ function PropertyDetails() {
   const isTenant =
     accountType === "مستأجر" || accountType === "tenant";
 
-  const submitViewingRequest = () => {
+  const sendingRequestRef = useRef(false);
+
+  const submitViewingRequest = async () => {
+    if (sendingRequestRef.current) return;
+
     setRequestMessage("");
     setRequestSuccess(false);
 
@@ -133,18 +137,24 @@ function PropertyDetails() {
       return;
     }
 
-    const result = addViewingRequest(
-      currentProperty.id,
-      appointment,
-      viewingNote
-    );
+    sendingRequestRef.current = true;
 
-    setRequestMessage(result.message);
-    setRequestSuccess(result.success);
+    try {
+      const result = await addViewingRequest(
+        currentProperty.id,
+        appointment,
+        viewingNote
+      );
 
-    if (result.success) {
-      setAppointment("");
-      setViewingNote("");
+      setRequestMessage(result.message);
+      setRequestSuccess(result.success);
+
+      if (result.success) {
+        setAppointment("");
+        setViewingNote("");
+      }
+    } finally {
+      sendingRequestRef.current = false;
     }
   };
 

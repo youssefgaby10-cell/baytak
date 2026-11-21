@@ -69,7 +69,7 @@ function MyRequests() {
     });
   };
 
-  const handleCancel = (requestId) => {
+  const handleCancel = async (requestId) => {
     const confirmed = window.confirm(
       isArabic
         ? "هل أنت متأكد أنك تريد إلغاء طلب المعاينة؟"
@@ -78,7 +78,7 @@ function MyRequests() {
 
     if (!confirmed) return;
 
-    const result = cancelViewingRequest(requestId);
+    const result = await cancelViewingRequest(requestId);
 
     if (result.success) {
       setMessage(

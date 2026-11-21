@@ -1,12 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { db } from "../firebase/firebase";import {
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { db } from "../firebase/firebase";
+import { useAuth } from "./AuthContext";
+import {
   collection,
   getDocs,
   addDoc,
   deleteDoc,
   doc,
   updateDoc,
-  onSnapshot
+  onSnapshot,
+  query,
+  where,
+  writeBatch,
 } from "firebase/firestore";
 
 const PropertyContext = createContext();
@@ -85,8 +90,70 @@ const getFavoriteIds = (userId) => {
 
 export function PropertyProvider({ children }) {
   const [properties, setProperties] = useState([]);
-  const [viewingRequests, setViewingRequests] = useState([]);
+  const { user: authUser } = useAuth();
+  const authUid = authUser?.uid || null;
+
+  // طلبات المعاينة والإشعارات (محفوظة في Firestore وتتحدث لحظياً)
+  const [tenantRequests, setTenantRequests] = useState([]);
+  const [ownerRequests, setOwnerRequests] = useState([]);
+  const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // الاشتراك اللحظي في طلبات المعاينة (كمستأجر وكمالك) والإشعارات الخاصة بالمستخدم
+  useEffect(() => {
+    if (!authUid) {
+      setTenantRequests([]);
+      setOwnerRequests([]);
+      setNotifications([]);
+      return undefined;
+    }
+
+    const mapDocs = (snapshot) =>
+      snapshot.docs.map((docSnap) => ({ ...docSnap.data(), id: docSnap.id }));
+
+    const logError = (label) => (error) =>
+      console.error(`خطأ في جلب ${label}:`, error);
+
+    const unsubscribers = [
+      onSnapshot(
+        query(collection(db, "viewingRequests"), where("tenantId", "==", authUid)),
+        (snapshot) => setTenantRequests(mapDocs(snapshot)),
+        logError("طلبات المعاينة (مستأجر)")
+      ),
+      onSnapshot(
+        query(collection(db, "viewingRequests"), where("ownerId", "==", authUid)),
+        (snapshot) => setOwnerRequests(mapDocs(snapshot)),
+        logError("طلبات المعاينة (مالك)")
+      ),
+      onSnapshot(
+        query(collection(db, "notifications"), where("userId", "==", authUid)),
+        (snapshot) =>
+          setNotifications(
+            mapDocs(snapshot).sort((a, b) =>
+              String(b.createdAt || "").localeCompare(String(a.createdAt || ""))
+            )
+          ),
+        logError("الإشعارات")
+      ),
+    ];
+
+    return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
+  }, [authUid]);
+
+  const viewingRequests = useMemo(() => {
+    const merged = new Map();
+    [...tenantRequests, ...ownerRequests].forEach((request) =>
+      merged.set(request.id, request)
+    );
+
+    return [...merged.values()].sort((a, b) =>
+      String(b.createdAt || "").localeCompare(String(a.createdAt || ""))
+    );
+  }, [tenantRequests, ownerRequests]);
+
+  const unreadNotificationsCount = notifications.filter(
+    (notification) => !notification.read
+  ).length;
 
   // جلب العقارات من Firestore بصورة حية (Real-time)
   useEffect(() => {
@@ -195,10 +262,26 @@ export function PropertyProvider({ children }) {
     try {
       await deleteDoc(doc(db, "properties", String(id)));
       
-      // حذف طلبات المعاينة المرتبطة بالعقار المحذوف
-      setViewingRequests((prev) =>
-        prev.filter((request) => String(request.propertyId) !== String(id))
-      );
+      // حذف طلبات المعاينة المرتبطة بالعقار المحذوف (المالك فقط يملك صلاحية ذلك)
+      try {
+        if (authUid) {
+          const related = await getDocs(
+            query(
+              collection(db, "viewingRequests"),
+              where("ownerId", "==", authUid),
+              where("propertyId", "==", String(id))
+            )
+          );
+
+          if (!related.empty) {
+            const cleanup = writeBatch(db);
+            related.docs.forEach((docSnap) => cleanup.delete(docSnap.ref));
+            await cleanup.commit();
+          }
+        }
+      } catch (cleanupError) {
+        console.error("تعذر حذف طلبات المعاينة المرتبطة:", cleanupError);
+      }
 
       return { success: true };
     } catch (error) {
@@ -207,10 +290,23 @@ export function PropertyProvider({ children }) {
     }
   };
 
-  // طلبات المعاينة (تظل محلية أو يمكن ربطها لاحقاً بـ Firestore حسب رغبتك)
-  const addViewingRequest = (propertyId, appointment, note = "") => {
-    const user = getCurrentUser();
-    const tenantId = getUserId(user);
+  // ===== طلبات المعاينة (Firestore) =====
+
+  const buildNotification = ({ userId, type, requestId, request, actorName }) => ({
+    userId,
+    fromUserId: authUid,
+    type,
+    requestId,
+    propertyId: String(request.propertyId || ""),
+    propertyTitle: request.propertyTitle || "",
+    actorName: actorName || "",
+    appointment: request.appointment || "",
+    read: false,
+    createdAt: new Date().toISOString(),
+  });
+
+  const addViewingRequest = async (propertyId, appointment, note = "") => {
+    const tenantId = authUid;
 
     if (!tenantId) {
       return {
@@ -218,6 +314,8 @@ export function PropertyProvider({ children }) {
         message: "تعذر تحديد حسابك. سجّل الدخول مرة أخرى.",
       };
     }
+
+    const user = getCurrentUser() || {};
 
     const property = properties.find(
       (item) => String(item.id) === String(propertyId)
@@ -227,6 +325,20 @@ export function PropertyProvider({ children }) {
       return {
         success: false,
         message: "العقار غير موجود.",
+      };
+    }
+
+    if (!property.ownerId) {
+      return {
+        success: false,
+        message: "لا يمكن طلب معاينة لهذا العقار حالياً.",
+      };
+    }
+
+    if (String(property.ownerId) === tenantId) {
+      return {
+        success: false,
+        message: "لا يمكنك طلب معاينة لعقارك أنت.",
       };
     }
 
@@ -244,10 +356,9 @@ export function PropertyProvider({ children }) {
       };
     }
 
-    const duplicate = viewingRequests.some(
+    const duplicate = tenantRequests.some(
       (request) =>
         String(request.propertyId) === String(propertyId) &&
-        String(request.tenantId) === tenantId &&
         ["pending", "accepted"].includes(request.status)
     );
 
@@ -258,56 +369,82 @@ export function PropertyProvider({ children }) {
       };
     }
 
-    const request = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      propertyId: property.id,
-      propertyTitle: property.title,
+    const now = new Date().toISOString();
+    const tenantName = user.fullName || user.name || "مستأجر";
+
+    const requestRef = doc(collection(db, "viewingRequests"));
+    const requestData = {
+      propertyId: String(property.id),
+      propertyTitle: property.title || "",
       tenantId,
-      tenantName: user.name || user.fullName || "مستأجر",
-      ownerId: property.ownerId ?? null,
+      tenantName,
+      ownerId: String(property.ownerId),
       appointment,
       note: String(note).trim(),
       status: "pending",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     };
 
-    setViewingRequests((prev) => [request, ...prev]);
+    const notificationRef = doc(collection(db, "notifications"));
 
-    return {
-      success: true,
-      message: "تم إرسال طلب المعاينة بنجاح.",
-      request,
-    };
+    try {
+      // الطلب والإشعار يُحفظان معاً أو لا يُحفظ أي منهما
+      const batch = writeBatch(db);
+
+      batch.set(requestRef, requestData);
+      batch.set(
+        notificationRef,
+        buildNotification({
+          userId: requestData.ownerId,
+          type: "viewing_request",
+          requestId: requestRef.id,
+          request: requestData,
+          actorName: tenantName,
+        })
+      );
+
+      await batch.commit();
+
+      return {
+        success: true,
+        message: "تم إرسال طلب المعاينة بنجاح.",
+        request: { ...requestData, id: requestRef.id },
+      };
+    } catch (error) {
+      console.error("خطأ في إرسال طلب المعاينة:", error);
+
+      return {
+        success: false,
+        message: "تعذر إرسال الطلب. حاول مرة أخرى.",
+      };
+    }
   };
 
   const getTenantViewingRequests = () => {
-    const tenantId = getUserId(getCurrentUser());
-    if (!tenantId) return [];
+    if (!authUid) return [];
     return viewingRequests.filter(
-      (request) => String(request.tenantId) === tenantId
+      (request) => String(request.tenantId) === authUid
     );
   };
 
   const getOwnerViewingRequests = () => {
-    const ownerId = getUserId(getCurrentUser());
-    if (!ownerId) return [];
+    if (!authUid) return [];
     return viewingRequests.filter(
-      (request) =>
-        request.ownerId !== null &&
-        String(request.ownerId) === ownerId
+      (request) => String(request.ownerId) === authUid
     );
   };
 
-  const updateViewingRequestStatus = (requestId, status) => {
+  const updateViewingRequestStatus = async (requestId, status) => {
     const allowedStatuses = ["accepted", "rejected"];
+
     if (!allowedStatuses.includes(status)) {
       return { success: false, message: "حالة الطلب غير صحيحة." };
     }
 
-    const user = getCurrentUser();
-    const ownerId = getUserId(user);
-    if (!ownerId) return { success: false, message: "تعذر تحديد حساب المالك." };
+    if (!authUid) {
+      return { success: false, message: "تعذر تحديد حساب المالك." };
+    }
 
     const request = viewingRequests.find(
       (item) => String(item.id) === String(requestId)
@@ -315,46 +452,131 @@ export function PropertyProvider({ children }) {
 
     if (!request) return { success: false, message: "طلب المعاينة غير موجود." };
 
-    if (request.ownerId === null || String(request.ownerId) !== ownerId) {
+    if (String(request.ownerId) !== authUid) {
       return { success: false, message: "ليس لديك صلاحية تعديل هذا الطلب." };
     }
 
-    setViewingRequests((prev) =>
-      prev.map((item) =>
-        String(item.id) === String(requestId)
-          ? { ...item, status, updatedAt: new Date().toISOString() }
-          : item
-      )
-    );
+    if (request.status !== "pending") {
+      return { success: false, message: "تم الرد على هذا الطلب من قبل." };
+    }
 
-    return {
-      success: true,
-      message: status === "accepted" ? "تم قبول طلب المعاينة." : "تم رفض طلب المعاينة.",
-    };
+    const ownerName =
+      (getCurrentUser() || {}).fullName ||
+      (getCurrentUser() || {}).name ||
+      "المالك";
+
+    try {
+      const batch = writeBatch(db);
+
+      batch.update(doc(db, "viewingRequests", request.id), {
+        status,
+        updatedAt: new Date().toISOString(),
+      });
+
+      batch.set(
+        doc(collection(db, "notifications")),
+        buildNotification({
+          userId: String(request.tenantId),
+          type: status === "accepted" ? "viewing_accepted" : "viewing_rejected",
+          requestId: request.id,
+          request,
+          actorName: ownerName,
+        })
+      );
+
+      await batch.commit();
+
+      return {
+        success: true,
+        message: status === "accepted" ? "تم قبول طلب المعاينة." : "تم رفض طلب المعاينة.",
+      };
+    } catch (error) {
+      console.error("خطأ في تحديث طلب المعاينة:", error);
+      return { success: false, message: "تعذر تحديث الطلب. حاول مرة أخرى." };
+    }
   };
 
-  const cancelViewingRequest = (requestId) => {
-    const tenantId = getUserId(getCurrentUser());
-    if (!tenantId) return { success: false, message: "تعذر تحديد حساب المستأجر." };
+  const cancelViewingRequest = async (requestId) => {
+    if (!authUid) {
+      return { success: false, message: "تعذر تحديد حساب المستأجر." };
+    }
 
     const request = viewingRequests.find(
       (item) => String(item.id) === String(requestId)
     );
 
     if (!request) return { success: false, message: "طلب المعاينة غير موجود." };
-    if (String(request.tenantId) !== tenantId) {
+
+    if (String(request.tenantId) !== authUid) {
       return { success: false, message: "ليس لديك صلاحية إلغاء هذا الطلب." };
     }
 
-    setViewingRequests((prev) =>
-      prev.map((item) =>
-        String(item.id) === String(requestId)
-          ? { ...item, status: "cancelled", updatedAt: new Date().toISOString() }
-          : item
-      )
-    );
+    if (!["pending", "accepted"].includes(request.status)) {
+      return { success: false, message: "لا يمكن إلغاء هذا الطلب." };
+    }
 
-    return { success: true, message: "تم إلغاء طلب المعاينة." };
+    const tenantName =
+      (getCurrentUser() || {}).fullName ||
+      (getCurrentUser() || {}).name ||
+      request.tenantName ||
+      "المستأجر";
+
+    try {
+      const batch = writeBatch(db);
+
+      batch.update(doc(db, "viewingRequests", request.id), {
+        status: "cancelled",
+        updatedAt: new Date().toISOString(),
+      });
+
+      batch.set(
+        doc(collection(db, "notifications")),
+        buildNotification({
+          userId: String(request.ownerId),
+          type: "viewing_cancelled",
+          requestId: request.id,
+          request,
+          actorName: tenantName,
+        })
+      );
+
+      await batch.commit();
+
+      return { success: true, message: "تم إلغاء طلب المعاينة." };
+    } catch (error) {
+      console.error("خطأ في إلغاء طلب المعاينة:", error);
+      return { success: false, message: "تعذر إلغاء الطلب. حاول مرة أخرى." };
+    }
+  };
+
+  // ===== الإشعارات =====
+
+  const markNotificationRead = async (notificationId) => {
+    try {
+      await updateDoc(doc(db, "notifications", String(notificationId)), {
+        read: true,
+      });
+    } catch (error) {
+      console.error("تعذر تحديث الإشعار:", error);
+    }
+  };
+
+  const markAllNotificationsRead = async () => {
+    const unread = notifications.filter((notification) => !notification.read);
+
+    if (unread.length === 0) return;
+
+    try {
+      const batch = writeBatch(db);
+
+      unread.forEach((notification) =>
+        batch.update(doc(db, "notifications", notification.id), { read: true })
+      );
+
+      await batch.commit();
+    } catch (error) {
+      console.error("تعذر تحديث الإشعارات:", error);
+    }
   };
 
   return (
@@ -375,6 +597,10 @@ export function PropertyProvider({ children }) {
         getOwnerViewingRequests,
         updateViewingRequestStatus,
         cancelViewingRequest,
+        notifications,
+        unreadNotificationsCount,
+        markNotificationRead,
+        markAllNotificationsRead,
       }}
     >
       {children}

@@ -26,8 +26,8 @@ function OwnerViewingRequests() {
 
   const requests = getOwnerViewingRequests();
 
-  const handleStatusChange = (requestId, status) => {
-    const result = updateViewingRequestStatus(requestId, status);
+  const handleStatusChange = async (requestId, status) => {
+    const result = await updateViewingRequestStatus(requestId, status);
 
     setMessage(
       result.success

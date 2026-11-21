@@ -4,15 +4,16 @@ import { FaBell, FaUserCircle } from "react-icons/fa";
 
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { useProperties } from "../../context/PropertyContext";
 
 function Header() {
   const { t } = useLanguage();
   const { loading: authLoading, user: authUser } = useAuth();
+  const { unreadNotificationsCount } = useProperties();
   const navigate = useNavigate();
 
   const [profileImage, setProfileImage] = useState("");
   const [username, setUsername] = useState("Username");
-  const [hasNotifications, setHasNotifications] = useState(false); // 1. حالة لتحديد وجود إشعارات
 
   useEffect(() => {
     const loadUser = () => {
@@ -35,20 +36,6 @@ function Header() {
           console.error("Error loading user data:", error);
         }
       }
-
-      // 2. فحص هل يوجد إشعارات أو رسائل جديدة (مثلاً ممتلئة في localStorage أو كمثال افتراضي)
-      const savedNotifications = localStorage.getItem("baytakNotifications");
-      if (savedNotifications) {
-        try {
-          const notifs = JSON.parse(savedNotifications);
-          setHasNotifications(Array.isArray(notifs) && notifs.length > 0);
-        } catch (e) {
-          setHasNotifications(false);
-        }
-      } else {
-        // افتراضيًا تقدر تخليها false أو true للتجربة
-        setHasNotifications(true); 
-      }
     };
 
     loadUser();
@@ -59,6 +46,11 @@ function Header() {
       window.removeEventListener("storage", loadUser);
     };
   }, []);
+
+  // النقطة الحمراء: يوجد إشعار غير مقروء، والإشعارات غير مغلقة من الإعدادات
+  const showNotificationDot =
+    unreadNotificationsCount > 0 &&
+    localStorage.getItem("baytakNotifications") !== "false";
 
   const navigateToProfile = () => {
     navigate("/profile");
@@ -104,8 +96,8 @@ function Header() {
         onClick={() => navigate("/notifications")}
       >
         <FaBell />
-        {/* 3. النقطة الحمراء تظهر فقط إذا كانت hasNotifications تساوي true */}
-        {hasNotifications && <span className="notification-dot"></span>}
+        {/* النقطة الحمراء تظهر عند وجود إشعار غير مقروء */}
+        {showNotificationDot && <span className="notification-dot"></span>}
       </button>
 
       <div

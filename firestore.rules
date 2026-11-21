@@ -3,36 +3,137 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ملفات المستخدمين: كل مستخدم يقرأ ويعدّل ملفه فقط
-    match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
+    // ---------- دوال مساعدة ----------
 
-      allow create: if request.auth != null
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isTenantAccount() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType == 'مستأجر';
+    }
+
+    // حالة الطلب بعد تنفيذ الكتابة الحالية (مهم لأن الطلب والإشعار يُكتبان معاً)
+    function requestAfter(requestId) {
+      return getAfter(/databases/$(database)/documents/viewingRequests/$(requestId)).data;
+    }
+
+    function isRequestParty(r, sender, recipient) {
+      return (r.tenantId == sender && r.ownerId == recipient)
+          || (r.ownerId == sender && r.tenantId == recipient);
+    }
+
+    function typeMatchesStatus(type, status) {
+      return (type == 'viewing_request' && status == 'pending')
+          || (type == 'viewing_accepted' && status == 'accepted')
+          || (type == 'viewing_rejected' && status == 'rejected')
+          || (type == 'viewing_cancelled' && status == 'cancelled');
+    }
+
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+
+    // ---------- ملفات المستخدمين ----------
+    // كل مستخدم يقرأ ويعدّل ملفه فقط، ونوع الحساب لا يتغير بعد إنشائه
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+
+      allow create: if signedIn()
         && request.auth.uid == userId
         && request.resource.data.accountType in ['مالك', 'مستأجر'];
 
-      // مسموح التعديل، لكن نوع الحساب لا يتغير بعد إنشائه
-      allow update: if request.auth != null
+      allow update: if signedIn()
         && request.auth.uid == userId
         && request.resource.data.accountType == resource.data.accountType;
 
       allow delete: if false;
     }
 
-    // العقارات: القراءة للجميع (مهم لظهورها في جوجل لاحقاً)،
-    // والكتابة لصاحب العقار فقط
+    // ---------- العقارات ----------
+    // القراءة للجميع (مهم لظهورها في جوجل)، والكتابة لصاحب العقار فقط
     match /properties/{propertyId} {
       allow read: if true;
 
-      allow create: if request.auth != null
+      allow create: if signedIn()
         && request.resource.data.ownerId == request.auth.uid;
 
-      allow update: if request.auth != null
+      allow update: if signedIn()
         && resource.data.ownerId == request.auth.uid
         && request.resource.data.ownerId == resource.data.ownerId;
 
-      allow delete: if request.auth != null
+      allow delete: if signedIn()
         && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ---------- طلبات المعاينة ----------
+    // يقرأها فقط المستأجر صاحب الطلب ومالك العقار
+    match /viewingRequests/{requestId} {
+      allow read: if signedIn()
+        && (resource.data.tenantId == request.auth.uid
+            || resource.data.ownerId == request.auth.uid);
+
+      // المستأجر فقط ينشئ الطلب، على عقار حقيقي، وبصاحب العقار الحقيقي
+      allow create: if signedIn()
+        && isTenantAccount()
+        && request.resource.data.keys().hasOnly([
+             'propertyId', 'propertyTitle', 'tenantId', 'tenantName', 'ownerId',
+             'appointment', 'note', 'status', 'createdAt', 'updatedAt'
+           ])
+        && request.resource.data.tenantId == request.auth.uid
+        && request.resource.data.ownerId != request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.note is string
+        && request.resource.data.note.size() <= 500
+        && get(/databases/$(database)/documents/properties/$(request.resource.data.propertyId)).data.ownerId
+             == request.resource.data.ownerId;
+
+      // المالك يقبل/يرفض (طلب جديد فقط)، والمستأجر يلغي. ولا يتغير شيء غير الحالة
+      allow update: if signedIn()
+        && onlyChanges(['status', 'updatedAt'])
+        && (
+          (resource.data.ownerId == request.auth.uid
+            && resource.data.status == 'pending'
+            && request.resource.data.status in ['accepted', 'rejected'])
+          ||
+          (resource.data.tenantId == request.auth.uid
+            && resource.data.status in ['pending', 'accepted']
+            && request.resource.data.status == 'cancelled')
+        );
+
+      // المالك يحذف طلبات عقاره (عند حذف العقار)
+      allow delete: if signedIn()
+        && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ---------- الإشعارات ----------
+    // يقرأها ويعدّلها (مقروء/غير مقروء) صاحبها فقط
+    match /notifications/{notificationId} {
+      allow read: if signedIn()
+        && resource.data.userId == request.auth.uid;
+
+      // لا يمكن إنشاء إشعار إلا بين طرفي طلب معاينة حقيقي، ويتوافق نوعه مع حالة الطلب
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+             'userId', 'fromUserId', 'type', 'requestId', 'propertyId',
+             'propertyTitle', 'actorName', 'appointment', 'read', 'createdAt'
+           ])
+        && request.resource.data.fromUserId == request.auth.uid
+        && request.resource.data.read == false
+        && isRequestParty(
+             requestAfter(request.resource.data.requestId),
+             request.auth.uid,
+             request.resource.data.userId)
+        && typeMatchesStatus(
+             request.resource.data.type,
+             requestAfter(request.resource.data.requestId).status);
+
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && onlyChanges(['read']);
+
+      allow delete: if signedIn()
+        && resource.data.userId == request.auth.uid;
     }
 
     // أي شيء آخر ممنوع
