@@ -93,7 +93,7 @@ function Register() {
     setSubmitting(true);
 
     try {
-      await register({
+      const { verificationSent } = await register({
         fullName,
         email,
         phone,
@@ -101,7 +101,15 @@ function Register() {
         accountType,
       });
 
-      alert(t.accountCreatedSuccessfully || "Account created successfully!");
+      alert(
+        verificationSent
+          ? isArabic
+            ? "تم إنشاء الحساب! أرسلنا رابط تأكيد إلى بريدك الإلكتروني. اضغط عليه (وراجع Spam لو لم يظهر) ثم سجّل الدخول."
+            : "Account created! We sent a confirmation link to your email. Click it (check Spam if you don't see it), then log in."
+          : isArabic
+            ? "تم إنشاء الحساب، لكن تعذر إرسال رابط التأكيد. سجّل الدخول واطلب إعادة إرساله."
+            : "Account created, but the confirmation link could not be sent. Try logging in and request it again."
+      );
       navigate("/login");
     } catch (error) {
       console.error("Error creating account:", error);

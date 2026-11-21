@@ -12,6 +12,7 @@ import {
   browserSessionPersistence,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  sendEmailVerification,
   setPersistence,
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -186,9 +187,21 @@ export function AuthProvider({ children }) {
           throw error;
         }
 
-        // نفس سلوك الموقع السابق: بعد التسجيل يذهب المستخدم لصفحة تسجيل الدخول
+        // رابط تأكيد البريد (لو فشل الإرسال، يقدر المستخدم يطلب إعادة الإرسال من صفحة الدخول)
+        let verificationSent = true;
+
+        try {
+          await sendEmailVerification(credential.user);
+        } catch (error) {
+          console.error("Could not send verification email:", error);
+          verificationSent = false;
+        }
+
+        // بعد التسجيل يذهب المستخدم لصفحة تسجيل الدخول (ولا يدخل قبل تأكيد بريده)
         await signOut(auth);
         clearSession();
+
+        return { verificationSent };
       } finally {
         busy.current = false;
       }
@@ -209,6 +222,13 @@ export function AuthProvider({ children }) {
           email.trim().toLowerCase(),
           password
         );
+
+        // لا يدخل أحد قبل تأكيد بريده الإلكتروني (حسابات Google مؤكدة تلقائياً)
+        if (!credential.user.emailVerified) {
+          await signOut(auth);
+          clearSession();
+          throw makeError("baytak/email-not-verified");
+        }
 
         let stored = await fetchStoredProfile(credential.user.uid);
 
@@ -238,6 +258,36 @@ export function AuthProvider({ children }) {
       }
     },
     [applySession, clearSession]
+  );
+
+  // إعادة إرسال رابط تأكيد البريد (بالبريد وكلمة المرور، ثم يُسجَّل الخروج مباشرة)
+  const resendVerificationEmail = useCallback(
+    async ({ email, password }) => {
+      busy.current = true;
+
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          email.trim().toLowerCase(),
+          password
+        );
+
+        try {
+          if (credential.user.emailVerified) {
+            return { alreadyVerified: true };
+          }
+
+          await sendEmailVerification(credential.user);
+          return { alreadyVerified: false };
+        } finally {
+          await signOut(auth).catch(() => {});
+          clearSession();
+        }
+      } finally {
+        busy.current = false;
+      }
+    },
+    [clearSession]
   );
 
   // دخول بحساب Google
@@ -340,10 +390,19 @@ export function AuthProvider({ children }) {
       register,
       login,
       loginWithGoogle,
+      resendVerificationEmail,
       logout,
       updateUserProfile,
     }),
-    [state, register, login, loginWithGoogle, logout, updateUserProfile]
+    [
+      state,
+      register,
+      login,
+      loginWithGoogle,
+      resendVerificationEmail,
+      logout,
+      updateUserProfile,
+    ]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

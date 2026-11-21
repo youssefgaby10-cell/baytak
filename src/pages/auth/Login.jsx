@@ -11,7 +11,7 @@ import { useSeo } from "../../utils/useSeo.js";
 function Login() {
   const navigate = useNavigate();
   const { language, t } = useLanguage();
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, resendVerificationEmail } = useAuth();
 
   useSeo({
     title: "تسجيل الدخول | Baytak",
@@ -31,6 +31,9 @@ function Login() {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [infoMessage, setInfoMessage] = useState("");
   const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const clearError = (field) => {
@@ -51,6 +54,16 @@ function Login() {
       : `This account is registered as ${actualType || "another account type"}.`;
 
   const handleAuthError = (error) => {
+    if (error?.code === "baytak/email-not-verified") {
+      setNeedsVerification(true);
+      setErrors({
+        general: isArabic
+          ? "لازم تأكد بريدك الإلكتروني أولاً. افتح رابط التأكيد اللي وصلك (وراجع Spam)."
+          : "Please confirm your email first. Open the confirmation link we sent you (check Spam too).",
+      });
+      return;
+    }
+
     if (error?.code === "baytak/role-mismatch") {
       setErrors({ role: roleMismatchMessage(error.actualType) });
       return;
@@ -67,6 +80,42 @@ function Login() {
 
     console.error("Login error:", error);
     setErrors({ general: getAuthErrorMessage(error, isArabic) });
+  };
+
+  // إعادة إرسال رابط تأكيد البريد
+  const handleResendVerification = async () => {
+    if (!email.trim() || !password) {
+      setErrors({
+        general: isArabic
+          ? "اكتب البريد وكلمة المرور أولاً ثم اضغط إعادة الإرسال."
+          : "Enter your email and password first, then resend.",
+      });
+      return;
+    }
+
+    setResending(true);
+    setErrors({});
+    setInfoMessage("");
+
+    try {
+      const result = await resendVerificationEmail({ email, password });
+
+      setInfoMessage(
+        result.alreadyVerified
+          ? isArabic
+            ? "بريدك مؤكد بالفعل، سجّل الدخول الآن."
+            : "Your email is already confirmed. You can log in now."
+          : isArabic
+            ? "أرسلنا رابط تأكيد جديد إلى بريدك. اضغط عليه ثم سجّل الدخول."
+            : "We sent a new confirmation link to your email. Click it, then log in."
+      );
+
+      if (result.alreadyVerified) setNeedsVerification(false);
+    } catch (error) {
+      handleAuthError(error);
+    } finally {
+      setResending(false);
+    }
   };
 
   // تسجيل الدخول بالبريد وكلمة المرور (Firebase Auth)
@@ -101,6 +150,8 @@ function Login() {
 
     setLoading(true);
     setErrors({});
+    setInfoMessage("");
+    setNeedsVerification(false);
 
     try {
       await login({
@@ -171,6 +222,41 @@ function Login() {
           {errors.general && (
             <div className="error-text" role="alert">
               {errors.general}
+            </div>
+          )}
+
+          {needsVerification && (
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={resending}
+              style={{
+                margin: "6px 0 14px",
+                padding: "10px 14px",
+                borderRadius: "10px",
+                border: "1px solid #2563eb",
+                background: "transparent",
+                color: "#2563eb",
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+            >
+              {resending
+                ? isArabic
+                  ? "جارٍ الإرسال..."
+                  : "Sending..."
+                : isArabic
+                  ? "إعادة إرسال رابط التأكيد"
+                  : "Resend confirmation link"}
+            </button>
+          )}
+
+          {infoMessage && (
+            <div
+              role="status"
+              style={{ color: "#16a34a", fontSize: "14px", margin: "6px 0 14px" }}
+            >
+              {infoMessage}
             </div>
           )}
 

@@ -9,6 +9,11 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    // البريد مؤكد (حسابات Google مؤكدة تلقائياً). مطلوب لأي كتابة على العقارات والطلبات
+    function verified() {
+      return request.auth.token.email_verified == true;
+    }
+
     function isTenantAccount() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.accountType == 'مستأجر';
     }
@@ -56,14 +61,14 @@ service cloud.firestore {
     match /properties/{propertyId} {
       allow read: if true;
 
-      allow create: if signedIn()
+      allow create: if signedIn() && verified()
         && request.resource.data.ownerId == request.auth.uid;
 
-      allow update: if signedIn()
+      allow update: if signedIn() && verified()
         && resource.data.ownerId == request.auth.uid
         && request.resource.data.ownerId == resource.data.ownerId;
 
-      allow delete: if signedIn()
+      allow delete: if signedIn() && verified()
         && resource.data.ownerId == request.auth.uid;
     }
 
@@ -75,7 +80,7 @@ service cloud.firestore {
             || resource.data.ownerId == request.auth.uid);
 
       // المستأجر فقط ينشئ الطلب، على عقار حقيقي، وبصاحب العقار الحقيقي
-      allow create: if signedIn()
+      allow create: if signedIn() && verified()
         && isTenantAccount()
         && request.resource.data.keys().hasOnly([
              'propertyId', 'propertyTitle', 'tenantId', 'tenantName', 'ownerId',
@@ -90,7 +95,7 @@ service cloud.firestore {
              == request.resource.data.ownerId;
 
       // المالك يقبل/يرفض (طلب جديد فقط) ويقفل الطلب المقبول بعد المعاينة، والمستأجر يلغي. ولا يتغير شيء غير الحالة
-      allow update: if signedIn()
+      allow update: if signedIn() && verified()
         && onlyChanges(['status', 'updatedAt'])
         && (
           (resource.data.ownerId == request.auth.uid
@@ -118,7 +123,7 @@ service cloud.firestore {
         && resource.data.userId == request.auth.uid;
 
       // لا يمكن إنشاء إشعار إلا بين طرفي طلب معاينة حقيقي، ويتوافق نوعه مع حالة الطلب
-      allow create: if signedIn()
+      allow create: if signedIn() && verified()
         && request.resource.data.keys().hasOnly([
              'userId', 'fromUserId', 'type', 'requestId', 'propertyId',
              'propertyTitle', 'actorName', 'appointment', 'read', 'createdAt'
