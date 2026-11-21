@@ -578,3 +578,8 @@ html.dark-mode .profile-page .profile-actions > .profile-logout > span {
   color: #fca5a5 !important;
   opacity: 1 !important;
 }
+
+/* حقل اختيار الصورة مخفي، ويتم فتحه من زر القلم عن طريق الـ ref */
+.profile-image-input {
+  display: none;
+}

@@ -267,3 +267,43 @@ html.dark-mode .settings-page .settings-item h2,
 html.dark-mode .settings-page .settings-item-left {
   color: #ffffff;
 }
+
+/* ===========================
+   Login & Register (dark mode)
+=========================== */
+
+html.dark-mode .account-type h3 {
+  color: #f1f5f9;
+}
+
+html.dark-mode .account-card {
+  background: #1c2130;
+  border-color: #2f3647;
+}
+
+html.dark-mode .account-card:hover {
+  border-color: #3b82f6;
+}
+
+html.dark-mode .account-card.active {
+  background: #16284d;
+  border-color: #3b82f6;
+}
+
+html.dark-mode .account-card h4 {
+  color: #f1f5f9;
+}
+
+html.dark-mode .account-card p {
+  color: #aab4c5;
+}
+
+html.dark-mode .google-btn {
+  background: #1c2130;
+  border-color: #2f3647;
+  color: #f1f5f9;
+}
+
+html.dark-mode .google-btn:hover {
+  background: #262c3b;
+}
