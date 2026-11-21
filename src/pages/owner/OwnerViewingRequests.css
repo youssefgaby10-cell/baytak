@@ -261,16 +261,3 @@
 .viewing-back-btn svg {
   font-size: 14px;
 }
-
-.viewing-status-completed {
-  color: #1d4ed8;
-  background: #e0ebff;
-}
-
-.viewing-complete-btn {
-  background: #2563eb;
-}
-
-.completed-message {
-  color: #1d4ed8;
-}

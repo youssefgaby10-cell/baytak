@@ -19,7 +19,6 @@ function OwnerViewingRequests() {
   const {
     getOwnerViewingRequests,
     updateViewingRequestStatus,
-    completeViewingRequest,
   } = useProperties();
 
   const { language } = useLanguage();
@@ -63,30 +62,6 @@ function OwnerViewingRequests() {
     }
   };
 
-  // قفل الطلب بعد إتمام المعاينة
-  const handleComplete = async (requestId) => {
-    const confirmed = window.confirm(
-      isArabic
-        ? "هل تمت المعاينة؟ سيتم إغلاق هذا الطلب."
-        : "Was the viewing completed? This request will be closed."
-    );
-
-    if (!confirmed) return;
-
-    const result = await completeViewingRequest(requestId);
-
-    setMessage(
-      result.success
-        ? isArabic
-          ? "تم إغلاق طلب المعاينة."
-          : "Viewing request closed."
-        : result.message ||
-            (isArabic
-              ? "تعذر إغلاق الطلب."
-              : "Could not close the request.")
-    );
-  };
-
   const formatDate = (dateValue) => {
     if (!dateValue) return isArabic ? "غير محدد" : "Not specified";
 
@@ -106,7 +81,6 @@ function OwnerViewingRequests() {
       accepted: isArabic ? "تمت الموافقة" : "Accepted",
       rejected: isArabic ? "مرفوض" : "Rejected",
       cancelled: isArabic ? "ملغي" : "Cancelled",
-      completed: isArabic ? "تمت المعاينة" : "Completed",
     };
 
     return statuses[status] || status;
@@ -245,35 +219,11 @@ function OwnerViewingRequests() {
               )}
 
               {request.status === "accepted" && (
-                <>
-                  <p className="viewing-result-message accepted-message">
-                    <FaCheck />
-                    {isArabic
-                      ? "تمت الموافقة على هذا الطلب."
-                      : "This request has been accepted."}
-                  </p>
-
-                  <div className="viewing-request-actions">
-                    <button
-                      type="button"
-                      className="viewing-complete-btn"
-                      onClick={() => handleComplete(request.id)}
-                    >
-                      <FaCheck />
-                      {isArabic
-                        ? "تمت المعاينة (إغلاق الطلب)"
-                        : "Viewing done (close request)"}
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {request.status === "completed" && (
-                <p className="viewing-result-message completed-message">
+                <p className="viewing-result-message accepted-message">
                   <FaCheck />
                   {isArabic
-                    ? "تمت المعاينة وتم إغلاق هذا الطلب."
-                    : "The viewing is done and this request is closed."}
+                    ? "تمت الموافقة على هذا الطلب."
+                    : "This request has been accepted."}
                 </p>
               )}
 

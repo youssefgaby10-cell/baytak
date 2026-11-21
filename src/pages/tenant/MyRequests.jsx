@@ -60,11 +60,6 @@ function MyRequests() {
       icon: <FaBan />,
       className: "cancelled",
     },
-    completed: {
-      label: isArabic ? "تمت المعاينة" : "Completed",
-      icon: <FaCheckCircle />,
-      className: "completed",
-    },
   };
 
   const formatDate = (value) => {
@@ -244,15 +239,6 @@ function MyRequests() {
                     {isArabic
                       ? "المالك رفض طلب المعاينة."
                       : "The owner rejected your request."}
-                  </p>
-                )}
-
-                {request.status === "completed" && (
-                  <p className="my-request-result completed">
-                    <FaCheckCircle />
-                    {isArabic
-                      ? "تمت المعاينة وتم إغلاق الطلب."
-                      : "The viewing is done and the request is closed."}
                   </p>
                 )}
 

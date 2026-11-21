@@ -10,7 +10,6 @@ const NOTIFICATION_TARGETS = {
   viewing_cancelled: "/owner-viewing-requests",
   viewing_accepted: "/my-requests",
   viewing_rejected: "/my-requests",
-  viewing_completed: "/my-requests",
 };
 
 function Notifications() {
@@ -66,14 +65,6 @@ function Notifications() {
           text: isArabic
             ? `اعتذر المالك عن طلب معاينة "${title}".`
             : `The owner declined your viewing request for "${title}".`,
-        };
-
-      case "viewing_completed":
-        return {
-          heading: isArabic ? "تمت المعاينة" : "Viewing completed",
-          text: isArabic
-            ? `أغلق المالك طلب معاينة "${title}" بعد إتمامها.`
-            : `The owner closed the viewing request for "${title}" after the viewing.`,
         };
 
       case "viewing_cancelled":

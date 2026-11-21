@@ -339,3 +339,77 @@ html.dark-mode .my-requests-back-btn:hover {
   background: #262c3b;
   border-color: #4ade80;
 }
+
+/* كروت طلبات المعاينة (مالك + مستأجر) في الدارك مود: كروت غامقة بنص فاتح */
+
+html.dark-mode .viewing-request-card,
+html.dark-mode .my-request-card {
+  background: #1c2130;
+  border-color: #2f3647;
+  color: #e5e7eb;
+}
+
+html.dark-mode .viewing-card-top,
+html.dark-mode .my-request-top {
+  border-bottom-color: #2f3647;
+}
+
+html.dark-mode .viewing-request-note,
+html.dark-mode .my-request-note {
+  background: #262c3b;
+}
+
+html.dark-mode .viewing-empty,
+html.dark-mode .my-requests-empty {
+  background: #1c2130;
+  border-color: #2f3647;
+}
+
+html.dark-mode .viewing-empty h2,
+html.dark-mode .my-requests-empty h2 {
+  color: #f1f5f9;
+}
+
+html.dark-mode .viewing-empty p,
+html.dark-mode .my-requests-empty p {
+  color: #aab4c5;
+}
+
+html.dark-mode .viewing-feedback,
+html.dark-mode .my-requests-message {
+  background: #12352a;
+  color: #86efac;
+}
+
+/* شارات الحالة */
+html.dark-mode .viewing-status-pending,
+html.dark-mode .my-request-status.pending {
+  color: #fcd34d;
+  background: #3a2e0b;
+}
+
+html.dark-mode .viewing-status-accepted,
+html.dark-mode .my-request-status.accepted {
+  color: #86efac;
+  background: #12352a;
+}
+
+html.dark-mode .viewing-status-rejected,
+html.dark-mode .viewing-status-cancelled,
+html.dark-mode .my-request-status.rejected,
+html.dark-mode .my-request-status.cancelled {
+  color: #fca5a5;
+  background: #3b1717;
+}
+
+/* رسائل النتيجة */
+html.dark-mode .accepted-message,
+html.dark-mode .my-request-result.accepted {
+  color: #4ade80;
+}
+
+html.dark-mode .rejected-message,
+html.dark-mode .my-request-result.rejected,
+html.dark-mode .my-request-result.cancelled {
+  color: #f87171;
+}
