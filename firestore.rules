@@ -27,7 +27,8 @@ service cloud.firestore {
       return (type == 'viewing_request' && status == 'pending')
           || (type == 'viewing_accepted' && status == 'accepted')
           || (type == 'viewing_rejected' && status == 'rejected')
-          || (type == 'viewing_cancelled' && status == 'cancelled');
+          || (type == 'viewing_cancelled' && status == 'cancelled')
+          || (type == 'viewing_completed' && status == 'completed');
     }
 
     function onlyChanges(keys) {
@@ -88,13 +89,17 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/properties/$(request.resource.data.propertyId)).data.ownerId
              == request.resource.data.ownerId;
 
-      // المالك يقبل/يرفض (طلب جديد فقط)، والمستأجر يلغي. ولا يتغير شيء غير الحالة
+      // المالك يقبل/يرفض (طلب جديد فقط) ويقفل الطلب المقبول بعد المعاينة، والمستأجر يلغي. ولا يتغير شيء غير الحالة
       allow update: if signedIn()
         && onlyChanges(['status', 'updatedAt'])
         && (
           (resource.data.ownerId == request.auth.uid
             && resource.data.status == 'pending'
             && request.resource.data.status in ['accepted', 'rejected'])
+          ||
+          (resource.data.ownerId == request.auth.uid
+            && resource.data.status == 'accepted'
+            && request.resource.data.status == 'completed')
           ||
           (resource.data.tenantId == request.auth.uid
             && resource.data.status in ['pending', 'accepted']

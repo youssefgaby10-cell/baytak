@@ -244,3 +244,12 @@
 .my-requests-back-btn svg {
   font-size: 14px;
 }
+
+.my-request-status.completed {
+  color: #1d4ed8;
+  background: #e0ebff;
+}
+
+.my-request-result.completed {
+  color: #1d4ed8;
+}

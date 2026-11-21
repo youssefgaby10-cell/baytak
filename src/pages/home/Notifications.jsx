@@ -10,6 +10,7 @@ const NOTIFICATION_TARGETS = {
   viewing_cancelled: "/owner-viewing-requests",
   viewing_accepted: "/my-requests",
   viewing_rejected: "/my-requests",
+  viewing_completed: "/my-requests",
 };
 
 function Notifications() {
@@ -67,9 +68,17 @@ function Notifications() {
             : `The owner declined your viewing request for "${title}".`,
         };
 
+      case "viewing_completed":
+        return {
+          heading: isArabic ? "تمت المعاينة" : "Viewing completed",
+          text: isArabic
+            ? `أغلق المالك طلب معاينة "${title}" بعد إتمامها.`
+            : `The owner closed the viewing request for "${title}" after the viewing.`,
+        };
+
       case "viewing_cancelled":
         return {
-          heading: isArabic ? "تم إلغاء طلب المعاينة" : "Viewing request cancelled",
+          heading: isArabic ? "تم إلغاء طلب معاينة" : "Viewing request cancelled",
           text: isArabic
             ? `${actor} ألغى طلب معاينة "${title}".`
             : `${actor} cancelled the viewing request for "${title}".`,
@@ -97,9 +106,6 @@ function Notifications() {
       <header className="notifications-header">
         <button type="button" onClick={() => navigate(-1)} aria-label={isArabic ? "رجوع" : "Back"}>
           <FaArrowLeft style={{ transform: isArabic ? "none" : "scaleX(-1)" }} />
-        </button>
-        <button type="button" onClick={() => navigate("/")} aria-label={isArabic ? "الرئيسية" : "Home"}>
-          {isArabic ? "الرئيسية" : "Home"}
         </button>
         <h1>
           {t.notificationsTitle || (isArabic ? "الإشعارات" : "Notifications")}

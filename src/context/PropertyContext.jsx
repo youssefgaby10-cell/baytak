@@ -496,6 +496,59 @@ export function PropertyProvider({ children }) {
     }
   };
 
+  // المالك يقفل الطلب بعد إتمام المعاينة (يتحول من "مقبول" إلى "مكتمل")
+  const completeViewingRequest = async (requestId) => {
+    if (!authUid) {
+      return { success: false, message: "تعذر تحديد حساب المالك." };
+    }
+
+    const request = viewingRequests.find(
+      (item) => String(item.id) === String(requestId)
+    );
+
+    if (!request) return { success: false, message: "طلب المعاينة غير موجود." };
+
+    if (String(request.ownerId) !== authUid) {
+      return { success: false, message: "ليس لديك صلاحية تعديل هذا الطلب." };
+    }
+
+    if (request.status !== "accepted") {
+      return { success: false, message: "يمكن إغلاق الطلبات المقبولة فقط." };
+    }
+
+    const ownerName =
+      (getCurrentUser() || {}).fullName ||
+      (getCurrentUser() || {}).name ||
+      "المالك";
+
+    try {
+      const batch = writeBatch(db);
+
+      batch.update(doc(db, "viewingRequests", request.id), {
+        status: "completed",
+        updatedAt: new Date().toISOString(),
+      });
+
+      batch.set(
+        doc(collection(db, "notifications")),
+        buildNotification({
+          userId: String(request.tenantId),
+          type: "viewing_completed",
+          requestId: request.id,
+          request,
+          actorName: ownerName,
+        })
+      );
+
+      await batch.commit();
+
+      return { success: true, message: "تم إغلاق طلب المعاينة." };
+    } catch (error) {
+      console.error("خطأ في إغلاق طلب المعاينة:", error);
+      return { success: false, message: "تعذر إغلاق الطلب. حاول مرة أخرى." };
+    }
+  };
+
   const cancelViewingRequest = async (requestId) => {
     if (!authUid) {
       return { success: false, message: "تعذر تحديد حساب المستأجر." };
@@ -597,6 +650,7 @@ export function PropertyProvider({ children }) {
         getOwnerViewingRequests,
         updateViewingRequestStatus,
         cancelViewingRequest,
+        completeViewingRequest,
         notifications,
         unreadNotificationsCount,
         markNotificationRead,
