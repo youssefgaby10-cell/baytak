@@ -24,6 +24,7 @@ import { db } from "../../firebase/firebase";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 import { useAuth } from "../../context/AuthContext.jsx";
 import { getPropertyTypeLabel } from "../../utils/propertySearch.js";
+import { isValidPhone, toWhatsappNumber } from "../../utils/phone.js";
 import "../../styles/PropertyDetails.css";
 import { useProperties } from "../../context/PropertyContext";
 import { useSeo } from "../../utils/useSeo.js";
@@ -47,6 +48,13 @@ function PropertyDetails() {
 
   const [appointment, setAppointment] = useState("");
   const [viewingNote, setViewingNote] = useState("");
+  const [viewingPhone, setViewingPhone] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("baytakUser"))?.phone || "";
+    } catch {
+      return "";
+    }
+  });
   const [requestMessage, setRequestMessage] = useState("");
   const [requestSuccess, setRequestSuccess] = useState(false);
 
@@ -195,13 +203,19 @@ function PropertyDetails() {
       return;
     }
 
+    if (!isValidPhone(viewingPhone)) {
+      setRequestMessage("من فضلك اكتب رقم هاتف صحيح ليتصل بك المالك.");
+      return;
+    }
+
     sendingRequestRef.current = true;
 
     try {
       const result = await addViewingRequest(
         currentProperty.id,
         appointment,
-        viewingNote
+        viewingNote,
+        viewingPhone
       );
 
       setRequestMessage(result.message);
@@ -267,11 +281,7 @@ function PropertyDetails() {
     Number.isFinite(longitude);
 
   // رقم واتساب بالصيغة الدولية (مصر)
-  const whatsappNumber = (() => {
-    const digits = String(contactPhone).replace(/\D/g, "");
-    if (digits.startsWith("20")) return digits;
-    return digits.replace(/^0/, "20");
-  })();
+  const whatsappNumber = toWhatsappNumber(contactPhone);
 
   return (
     <div className="property-details-page">
@@ -496,6 +506,20 @@ function PropertyDetails() {
               }
             />
 
+            <label htmlFor="viewing-phone">
+              رقم هاتفك للتواصل (يظهر للمالك فقط)
+            </label>
+
+            <input
+              id="viewing-phone"
+              type="tel"
+              inputMode="tel"
+              dir="ltr"
+              value={viewingPhone}
+              onChange={(event) => setViewingPhone(event.target.value)}
+              placeholder="01XXXXXXXXX"
+            />
+
             <label htmlFor="viewing-note">
               ملاحظات (اختياري)
             </label>
@@ -542,6 +566,13 @@ function PropertyDetails() {
               <FaPhone />
               سجّل الدخول للتواصل مع المالك
             </button>
+          )}
+
+          {authUser && !isOwnProperty && !contactPhone && (
+            <p className="details-contact-note">
+              رقم المالك المباشر غير متاح لهذا العقار. اطلب معاينة من الأعلى
+              وسيتواصل معك المالك على رقمك.
+            </p>
           )}
 
           {authUser && !isOwnProperty && contactPhone && (

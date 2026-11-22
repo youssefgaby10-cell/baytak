@@ -745,3 +745,13 @@ flex-direction:column;
     height: 36px;
   }
 }
+
+.details-contact-note {
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.08);
+  font-size: 14px;
+  line-height: 1.7;
+}

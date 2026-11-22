@@ -357,7 +357,12 @@ export function PropertyProvider({ children }) {
     createdAt: new Date().toISOString(),
   });
 
-  const addViewingRequest = async (propertyId, appointment, note = "") => {
+  const addViewingRequest = async (
+    propertyId,
+    appointment,
+    note = "",
+    tenantPhone = ""
+  ) => {
     const tenantId = authUid;
 
     if (!tenantId) {
@@ -401,6 +406,15 @@ export function PropertyProvider({ children }) {
       };
     }
 
+    const phoneDigits = String(tenantPhone || "").replace(/\D/g, "");
+
+    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+      return {
+        success: false,
+        message: "من فضلك اكتب رقم هاتف صحيح ليتصل بك المالك.",
+      };
+    }
+
     if (Date.parse(appointment) <= Date.now()) {
       return {
         success: false,
@@ -430,6 +444,7 @@ export function PropertyProvider({ children }) {
       propertyTitle: property.title || "",
       tenantId,
       tenantName,
+      tenantPhone: String(tenantPhone).trim().slice(0, 20),
       ownerId: String(property.ownerId),
       appointment,
       note: String(note).trim(),

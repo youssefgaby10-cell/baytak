@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { toWhatsappNumber } from "../../utils/phone.js";
 import { useNavigate } from "react-router-dom";
 import {
   FaCalendarAlt,
@@ -10,6 +11,8 @@ import {
   FaInbox,
   FaArrowLeft,
   FaArrowRight,
+  FaPhone,
+  FaWhatsapp,
 } from "react-icons/fa";
 import { useProperties } from "../../context/PropertyContext";
 import { useLanguage } from "../../context/LanguageContext";
@@ -170,6 +173,37 @@ function OwnerViewingRequests() {
                   {" "}
                   {request.tenantName || (isArabic ? "غير معروف" : "Unknown")}
                 </p>
+
+                {request.tenantPhone &&
+                  ["pending", "accepted"].includes(request.status) && (
+                    <>
+                      <p>
+                        <FaPhone />
+                        <strong>
+                          {isArabic ? "رقم المستأجر:" : "Tenant phone:"}
+                        </strong>{" "}
+                        <span dir="ltr">{request.tenantPhone}</span>
+                      </p>
+
+                      <div className="viewing-contact-actions">
+                        <a
+                          className="viewing-call-btn"
+                          href={`tel:${request.tenantPhone}`}
+                        >
+                          <FaPhone /> {isArabic ? "اتصال" : "Call"}
+                        </a>
+
+                        <a
+                          className="viewing-whatsapp-btn"
+                          href={`https://wa.me/${toWhatsappNumber(request.tenantPhone)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <FaWhatsapp /> {isArabic ? "واتساب" : "WhatsApp"}
+                        </a>
+                      </div>
+                    </>
+                  )}
 
                 <p>
                   <FaCalendarAlt />

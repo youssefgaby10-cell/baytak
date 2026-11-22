@@ -107,9 +107,12 @@ service cloud.firestore {
       allow create: if signedIn() && verified()
         && isTenantAccount()
         && request.resource.data.keys().hasOnly([
-             'propertyId', 'propertyTitle', 'tenantId', 'tenantName', 'ownerId',
-             'appointment', 'note', 'status', 'createdAt', 'updatedAt'
+             'propertyId', 'propertyTitle', 'tenantId', 'tenantName', 'tenantPhone',
+             'ownerId', 'appointment', 'note', 'status', 'createdAt', 'updatedAt'
            ])
+        && request.resource.data.tenantPhone is string
+        && request.resource.data.tenantPhone.size() >= 8
+        && request.resource.data.tenantPhone.size() <= 20
         && request.resource.data.tenantId == request.auth.uid
         && request.resource.data.ownerId != request.auth.uid
         && request.resource.data.status == 'pending'

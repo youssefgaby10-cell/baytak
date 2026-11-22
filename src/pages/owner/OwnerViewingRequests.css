@@ -261,3 +261,32 @@
 .viewing-back-btn svg {
   font-size: 14px;
 }
+
+.viewing-contact-actions {
+  display: flex;
+  gap: 10px;
+  margin: 6px 0 14px;
+}
+
+.viewing-call-btn,
+.viewing-whatsapp-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.viewing-call-btn {
+  background: #16845b;
+}
+
+.viewing-whatsapp-btn {
+  background: #25d366;
+}
