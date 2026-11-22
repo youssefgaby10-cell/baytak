@@ -1,29 +1,57 @@
-# React + Vite
+# Baytak | بيتك
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+منصة عقارية لعرض والبحث عن الشقق والفيلات والمحلات والأراضي للبيع والإيجار في مصر.
 
-Currently, two official plugins are available:
+**الموقع:** https://baytak-7di4.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## التقنيات
 
-## React Compiler
+- React + Vite + React Router
+- Firebase: Authentication (بريد + Google) و Firestore
+- Vercel: الاستضافة و Serverless Function للبحث الذكي (`api/ai-search.js`)
+- Gemini API: تحويل جملة البحث إلى كلمات مفتاحية
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## التشغيل محلياً
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+> البحث الذكي (`/api/ai-search`) يعمل على Vercel فقط. محلياً يرجع البحث العادي تلقائياً.
 
-## Translation updates
+## أوامر مفيدة
 
-The UI now uses the Arabic/English language context in the updated pages and components. The notification bell also navigates to the protected `/notifications` page, which currently shows an empty-state message when there are no notifications.
+| الأمر | الوظيفة |
+|---|---|
+| `npm run dev` | تشغيل نسخة التطوير |
+| `npm run build` | بناء النسخة النهائية (يولّد `public/sitemap.xml` تلقائياً قبل البناء) |
+| `npm run lint` | فحص الكود |
 
-To install and run locally:
+## إعداد Firebase (مرة واحدة)
 
-1. Install Node.js (use a version compatible with the Vite version in `package.json`).
-2. Run `npm install`.
-3. If you use the server's AI feature, copy `.env.example` to `.env` and add your own `OPENAI_API_KEY`.
-4. Run `npm run dev`.
+1. **Authentication ← Sign-in method:** فعّل Email/Password و Google.
+2. **Authentication ← Settings ← Authorized domains:** أضف دومين الموقع.
+3. **Firestore ← Rules:** انسخ محتوى `firestore.rules` واضغط Publish.
 
-The original `.env` file is intentionally not included in this archive; keep your existing local secrets private.
+## الإعداد على Vercel
+
+- **Environment Variables:** أضف `GEMINI_API_KEY` ثم اعمل Redeploy.
+- **كل `git push` على `main`** يُنشر تلقائياً.
+
+## هيكل المشروع
+
+```
+api/            دوال Vercel (البحث الذكي)
+scripts/        سكربت توليد sitemap.xml
+public/         ملفات ثابتة (صور، robots.txt، sitemap.xml)
+src/context/    Auth، العقارات والطلبات والإشعارات، اللغة، الثيم
+src/pages/      صفحات الموقع
+src/routes/     المسارات وحماية الصفحات
+firestore.rules قواعد أمان Firestore
+```
+
+## ملاحظات أمان
+
+- لا تُرفع ملفات `.env` أبداً.
+- مفتاح Firebase في `src/firebase/firebase.js` عام بطبيعته، والحماية الحقيقية في `firestore.rules`.
