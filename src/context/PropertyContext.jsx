@@ -198,19 +198,22 @@ export function PropertyProvider({ children }) {
 
       const ownerId = getUserId(user);
       const propertyRef = doc(collection(db, "properties"));
-      const batch = writeBatch(db);
 
-      batch.set(propertyRef, propertyData);
+      // العقار أولاً
+      await setDoc(propertyRef, propertyData);
 
-      // رقم التواصل يُحفظ منفصلاً ويراه المسجلون فقط (وليس الزوار)
+      // رقم التواصل منفصل (يراه المسجلون فقط). لو فشل لا يمنع حفظ العقار
       if (user?.phone) {
-        batch.set(doc(db, "propertyContacts", propertyRef.id), {
-          ownerId,
-          phone: String(user.phone),
-        });
+        try {
+          await setDoc(doc(db, "propertyContacts", propertyRef.id), {
+            ownerId,
+            phone: String(user.phone),
+          });
+        } catch (contactError) {
+          console.error("تعذر حفظ رقم التواصل:", contactError);
+        }
       }
 
-      await batch.commit();
       return { success: true, id: propertyRef.id };
     } catch (error) {
       console.error("خطأ أثناء إضافة العقار:", error);
