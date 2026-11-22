@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { Suspense, lazy, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
@@ -13,12 +13,23 @@ import {
   FaCommentDots,
   FaShareAlt,
   FaCalendarAlt,
+  FaChevronLeft,
+  FaChevronRight,
+  FaTimes,
+  FaMapMarkedAlt,
 } from "react-icons/fa";
 
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
 import { useLanguage } from "../../context/LanguageContext.jsx";
+import { useAuth } from "../../context/AuthContext.jsx";
+import { getPropertyTypeLabel } from "../../utils/propertySearch.js";
 import "../../styles/PropertyDetails.css";
 import { useProperties } from "../../context/PropertyContext";
 import { useSeo } from "../../utils/useSeo.js";
+
+// الخريطة تُحمَّل عند الحاجة فقط (تخفف تحميل بقية الموقع)
+const PropertyMap = lazy(() => import("../../components/property/PropertyMap"));
 
 function PropertyDetails() {
   const { t } = useLanguage();
@@ -31,12 +42,19 @@ function PropertyDetails() {
     loading,
     toggleFavorite,
     addViewingRequest,
+    recordPropertyView,
   } = useProperties();
 
   const [appointment, setAppointment] = useState("");
   const [viewingNote, setViewingNote] = useState("");
   const [requestMessage, setRequestMessage] = useState("");
   const [requestSuccess, setRequestSuccess] = useState(false);
+
+  const { user: authUser } = useAuth();
+  const [activeImage, setActiveImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [contactPhone, setContactPhone] = useState("");
+  const touchStartX = useRef(null);
 
   // الرابط /property/:id هو المصدر الأساسي، وlocation.state احتياطي (الرابط القديم)
   const wantedId = routeId ?? routeState?.id;
@@ -80,6 +98,46 @@ function PropertyDetails() {
           noindex: true,
         }
   );
+
+  const currentId = currentProperty?.id ? String(currentProperty.id) : "";
+  const isRealProperty = Boolean(
+    currentId && properties?.some((item) => String(item.id) === currentId)
+  );
+  const isOwnProperty =
+    Boolean(authUser?.uid) &&
+    String(currentProperty?.ownerId || "") === authUser.uid;
+
+  // تسجيل مشاهدة (مرة لكل جلسة، ولا تُحسب لصاحب العقار)
+  useEffect(() => {
+    if (isRealProperty && !isOwnProperty) {
+      recordPropertyView(currentId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRealProperty, isOwnProperty, currentId]);
+
+  // رقم التواصل يظهر للمسجلين فقط
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!authUser || !currentId || !isRealProperty) {
+      setContactPhone("");
+      return undefined;
+    }
+
+    getDoc(doc(db, "propertyContacts", currentId))
+      .then((snapshot) => {
+        if (!cancelled) {
+          setContactPhone(snapshot.exists() ? snapshot.data().phone || "" : "");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setContactPhone("");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authUser, currentId, isRealProperty]);
 
   if (!currentProperty) {
     if (loading) {
@@ -158,6 +216,63 @@ function PropertyDetails() {
     }
   };
 
+  // ===== معرض الصور =====
+  const gallery = (
+    Array.isArray(currentProperty.images) && currentProperty.images.length > 0
+      ? currentProperty.images
+      : [currentProperty.image]
+  ).filter(Boolean);
+
+  const imageIndex = Math.min(activeImage, Math.max(gallery.length - 1, 0));
+  const currentImage = gallery[imageIndex] || currentProperty.image;
+
+  const showPrevious = () =>
+    setActiveImage((imageIndex - 1 + gallery.length) % gallery.length);
+
+  const showNext = () => setActiveImage((imageIndex + 1) % gallery.length);
+
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null || gallery.length < 2) return;
+
+    const distance = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+
+    if (Math.abs(distance) < 40) return;
+
+    // سحب لليسار = التالي، سحب لليمين = السابق
+    if (distance < 0) showNext();
+    else showPrevious();
+  };
+
+  // ===== بيانات العرض =====
+  const priceNumber = Number(currentProperty.price);
+  const priceText = Number.isFinite(priceNumber)
+    ? priceNumber.toLocaleString("en-US")
+    : currentProperty.price;
+
+  const listingLabel =
+    currentProperty.listingType === "rent" ? "للإيجار" : "للبيع";
+  const typeLabel = getPropertyTypeLabel(currentProperty, true);
+
+  const latitude = Number(currentProperty.latitude);
+  const longitude = Number(currentProperty.longitude);
+  const hasCoordinates =
+    currentProperty.latitude != null &&
+    currentProperty.longitude != null &&
+    Number.isFinite(latitude) &&
+    Number.isFinite(longitude);
+
+  // رقم واتساب بالصيغة الدولية (مصر)
+  const whatsappNumber = (() => {
+    const digits = String(contactPhone).replace(/\D/g, "");
+    if (digits.startsWith("20")) return digits;
+    return digits.replace(/^0/, "20");
+  })();
+
   return (
     <div className="property-details-page">
       <div className="details-header">
@@ -174,9 +289,39 @@ function PropertyDetails() {
 
       <div className="details-image">
         <img
-          src={currentProperty.image}
+          src={currentImage}
           alt={currentProperty.title}
+          onClick={() => setLightboxOpen(true)}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+          style={{ cursor: "zoom-in" }}
         />
+
+        {gallery.length > 1 && (
+          <>
+            <button
+              type="button"
+              className="gallery-nav gallery-prev"
+              onClick={showPrevious}
+              aria-label="الصورة السابقة"
+            >
+              <FaChevronLeft />
+            </button>
+
+            <button
+              type="button"
+              className="gallery-nav gallery-next"
+              onClick={showNext}
+              aria-label="الصورة التالية"
+            >
+              <FaChevronRight />
+            </button>
+
+            <span className="gallery-counter">
+              {imageIndex + 1} / {gallery.length}
+            </span>
+          </>
+        )}
 
         <button
           className="details-favorite-btn"
@@ -191,11 +336,86 @@ function PropertyDetails() {
         </button>
       </div>
 
+      {gallery.length > 1 && (
+        <div className="details-thumbs">
+          {gallery.map((source, index) => (
+            <button
+              key={`${index}-${source.slice(-12)}`}
+              type="button"
+              className={index === imageIndex ? "active" : ""}
+              onClick={() => setActiveImage(index)}
+              aria-label={`صورة ${index + 1}`}
+            >
+              <img src={source} alt="" />
+            </button>
+          ))}
+        </div>
+      )}
+
+      {lightboxOpen && (
+        <div
+          className="details-lightbox"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            className="lightbox-close"
+            onClick={() => setLightboxOpen(false)}
+            aria-label="إغلاق"
+          >
+            <FaTimes />
+          </button>
+
+          {gallery.length > 1 && (
+            <button
+              type="button"
+              className="gallery-nav gallery-prev"
+              onClick={(event) => {
+                event.stopPropagation();
+                showPrevious();
+              }}
+              aria-label="الصورة السابقة"
+            >
+              <FaChevronLeft />
+            </button>
+          )}
+
+          <img
+            src={currentImage}
+            alt={currentProperty.title}
+            onClick={(event) => event.stopPropagation()}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+          />
+
+          {gallery.length > 1 && (
+            <button
+              type="button"
+              className="gallery-nav gallery-next"
+              onClick={(event) => {
+                event.stopPropagation();
+                showNext();
+              }}
+              aria-label="الصورة التالية"
+            >
+              <FaChevronRight />
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="details-content">
+        <div className="details-badges">
+          <span className="badge badge-listing">{listingLabel}</span>
+          {typeLabel && <span className="badge">{typeLabel}</span>}
+        </div>
+
         <h1>{currentProperty.title}</h1>
 
         <h2 className="details-price">
-          EGP {currentProperty.price}
+          EGP {priceText}
         </h2>
 
         <div className="details-location">
@@ -230,6 +450,29 @@ function PropertyDetails() {
           <h3>{t.description}</h3>
           <p>{currentProperty.description}</p>
         </div>
+
+        {hasCoordinates && (
+          <section className="details-map-section">
+            <h3>
+              <FaMapMarkedAlt /> الموقع على الخريطة
+            </h3>
+
+            <Suspense
+              fallback={<div className="details-map-loading">جارٍ تحميل الخريطة...</div>}
+            >
+              <PropertyMap latitude={latitude} longitude={longitude} />
+            </Suspense>
+
+            <a
+              className="details-map-link"
+              href={`https://www.google.com/maps?q=${latitude},${longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              فتح في خرائط جوجل
+            </a>
+          </section>
+        )}
 
         {isTenant && (
           <section className="viewing-request-section">
@@ -291,34 +534,43 @@ function PropertyDetails() {
         )}
 
         <div className="details-actions">
-          <button
-            className="call-btn"
-            onClick={() => {
-              window.location.href =
-                `tel:${currentProperty.phone}`;
-            }}
-          >
-            <FaPhone />
-            {t.call}
-          </button>
+          {!authUser && (
+            <button
+              className="call-btn"
+              onClick={() => navigate("/login")}
+            >
+              <FaPhone />
+              سجّل الدخول للتواصل مع المالك
+            </button>
+          )}
 
-          <button
-            className="chat-btn"
-            onClick={() => {
-              const phone = (
-                currentProperty.phone || ""
-              ).replace(/^0/, "20");
+          {authUser && !isOwnProperty && contactPhone && (
+            <>
+              <button
+                className="call-btn"
+                onClick={() => {
+                  window.location.href = `tel:${contactPhone}`;
+                }}
+              >
+                <FaPhone />
+                {t.call}
+              </button>
 
-              window.open(
-                `https://wa.me/${phone}`,
-                "_blank",
-                "noopener,noreferrer"
-              );
-            }}
-          >
-            <FaCommentDots />
-            {t.chat}
-          </button>
+              <button
+                className="chat-btn"
+                onClick={() => {
+                  window.open(
+                    `https://wa.me/${whatsappNumber}`,
+                    "_blank",
+                    "noopener,noreferrer"
+                  );
+                }}
+              >
+                <FaCommentDots />
+                {t.chat}
+              </button>
+            </>
+          )}
 
           <button
             className="share-btn"

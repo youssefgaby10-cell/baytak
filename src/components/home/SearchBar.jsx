@@ -217,14 +217,13 @@ function SearchBar({
       setSearchResults(finalResults);
     }
 
-    navigate("/search", {
-      state: {
-        searchTerm: query,
-        searchResults: finalResults,
-        activeFilter,
-        activeCategory,
-      },
-    });
+    // الرابط يحمل كل شيء (يمكن مشاركته وتحديث الصفحة)
+    const searchParams = new URLSearchParams();
+    searchParams.set("q", searchQuery);
+    searchParams.set("s", query);
+    if (activeFilter) searchParams.set("listing", activeFilter);
+
+    navigate(`/search?${searchParams.toString()}`);
   };
 
   return (

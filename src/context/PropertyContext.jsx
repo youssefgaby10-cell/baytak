@@ -4,9 +4,10 @@ import { useAuth } from "./AuthContext";
 import {
   collection,
   getDocs,
-  addDoc,
   deleteDoc,
   doc,
+  increment,
+  setDoc,
   updateDoc,
   onSnapshot,
   query,
@@ -195,8 +196,22 @@ export function PropertyProvider({ children }) {
         createdAt: new Date().toISOString(),
       };
 
-      const docRef = await addDoc(collection(db, "properties"), propertyData);
-      return { success: true, id: docRef.id };
+      const ownerId = getUserId(user);
+      const propertyRef = doc(collection(db, "properties"));
+      const batch = writeBatch(db);
+
+      batch.set(propertyRef, propertyData);
+
+      // رقم التواصل يُحفظ منفصلاً ويراه المسجلون فقط (وليس الزوار)
+      if (user?.phone) {
+        batch.set(doc(db, "propertyContacts", propertyRef.id), {
+          ownerId,
+          phone: String(user.phone),
+        });
+      }
+
+      await batch.commit();
+      return { success: true, id: propertyRef.id };
     } catch (error) {
       console.error("خطأ أثناء إضافة العقار:", error);
       return { success: false, message: "تعذر إضافة العقار، حاول مرة أخرى." };
@@ -212,10 +227,40 @@ export function PropertyProvider({ children }) {
       delete cleanData.id; // لا نحفظ الـ id داخل الحقول
 
       await updateDoc(propertyRef, cleanData);
+
+      // تحديث رقم التواصل من ملف المالك (لا يوقف الحفظ لو فشل)
+      try {
+        const user = getCurrentUser();
+        if (user?.phone && authUid) {
+          await setDoc(
+            doc(db, "propertyContacts", String(updatedProperty.id)),
+            { ownerId: authUid, phone: String(user.phone) }
+          );
+        }
+      } catch (contactError) {
+        console.error("تعذر تحديث رقم التواصل:", contactError);
+      }
+
       return { success: true };
     } catch (error) {
       console.error("خطأ في تحديث العقار:", error);
       return { success: false };
+    }
+  };
+
+  // عدّاد المشاهدات: مرة واحدة لكل عقار في الجلسة، ولا يُحسب مالك العقار نفسه
+  const recordPropertyView = async (propertyId) => {
+    const key = `baytakViewed_${propertyId}`;
+
+    try {
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, "1");
+
+      await updateDoc(doc(db, "properties", String(propertyId)), {
+        views: increment(1),
+      });
+    } catch (error) {
+      console.warn("تعذر تسجيل المشاهدة:", error?.code || error);
     }
   };
 
@@ -261,7 +306,14 @@ export function PropertyProvider({ children }) {
   const deleteProperty = async (id) => {
     try {
       await deleteDoc(doc(db, "properties", String(id)));
-      
+
+      // حذف رقم التواصل المرتبط بالعقار
+      try {
+        await deleteDoc(doc(db, "propertyContacts", String(id)));
+      } catch (contactError) {
+        console.error("تعذر حذف رقم التواصل:", contactError);
+      }
+
       // حذف طلبات المعاينة المرتبطة بالعقار المحذوف (المالك فقط يملك صلاحية ذلك)
       try {
         if (authUid) {
@@ -597,6 +649,7 @@ export function PropertyProvider({ children }) {
         getOwnerViewingRequests,
         updateViewingRequestStatus,
         cancelViewingRequest,
+        recordPropertyView,
         notifications,
         unreadNotificationsCount,
         markNotificationRead,

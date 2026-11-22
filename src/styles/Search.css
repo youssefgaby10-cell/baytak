@@ -83,3 +83,226 @@
 .search-page[dir="ltr"] {
   text-align: left;
 }
+
+/* ===========================
+   فلاتر البحث
+=========================== */
+
+.search-page-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search-page-form input {
+  flex: 1;
+  min-width: 0;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #d7dce7;
+  border-radius: 12px;
+  font-size: 15px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+
+.search-page-form button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.search-page-form button:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.search-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.search-toolbar select,
+.search-filters select,
+.filter-price input {
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d7dce7;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: #111827;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 16px;
+  border: 1px solid #d7dce7;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.toolbar-btn.active {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.filters-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px;
+  margin-bottom: 18px;
+  border: 1px solid #e1e5ef;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chips .chip {
+  padding: 8px 16px;
+  border: 1px solid #d7dce7;
+  border-radius: 999px;
+  background: #fff;
+  color: #374151;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.filter-chips .chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+
+.filter-price {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-price input {
+  flex: 1;
+  min-width: 0;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-apply,
+.filter-clear {
+  flex: 1;
+  height: 44px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.filter-apply {
+  border: none;
+  background: #2563eb;
+  color: #fff;
+}
+
+.filter-clear {
+  border: 1px solid #d7dce7;
+  background: transparent;
+  color: #374151;
+}
+
+/* الدارك مود */
+.search-page.dark-mode .search-page-form input,
+.search-page.dark-mode .search-toolbar select,
+.search-page.dark-mode .search-filters select,
+.search-page.dark-mode .filter-price input,
+.search-page.dark-mode .toolbar-btn,
+html.dark-mode .search-page-form input,
+html.dark-mode .search-toolbar select,
+html.dark-mode .search-filters select,
+html.dark-mode .filter-price input,
+html.dark-mode .toolbar-btn {
+  background: #1c2130;
+  border-color: #2f3647;
+  color: #f1f5f9;
+}
+
+.search-page.dark-mode .search-filters,
+html.dark-mode .search-filters {
+  background: #151a26;
+  border-color: #2f3647;
+}
+
+.search-page.dark-mode .filter-label,
+html.dark-mode .filter-label {
+  color: #cbd5e1;
+}
+
+.search-page.dark-mode .filter-chips .chip,
+html.dark-mode .filter-chips .chip,
+.search-page.dark-mode .filter-clear,
+html.dark-mode .filter-clear {
+  background: #1c2130;
+  border-color: #2f3647;
+  color: #e5e7eb;
+}
+
+.search-page.dark-mode .filter-chips .chip.active,
+html.dark-mode .filter-chips .chip.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}

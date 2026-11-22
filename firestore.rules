@@ -36,6 +36,12 @@ service cloud.firestore {
           || (type == 'viewing_completed' && status == 'completed');
     }
 
+    // أي زائر يزيد عدّاد المشاهدات بمقدار 1 فقط، ولا يغيّر أي حقل آخر
+    function onlyViewsIncrement() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views'])
+        && request.resource.data.views == resource.data.get('views', 0) + 1;
+    }
+
     function onlyChanges(keys) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
     }
@@ -67,6 +73,24 @@ service cloud.firestore {
       allow update: if signedIn() && verified()
         && resource.data.ownerId == request.auth.uid
         && request.resource.data.ownerId == resource.data.ownerId;
+
+      allow update: if onlyViewsIncrement();
+
+      allow delete: if signedIn() && verified()
+        && resource.data.ownerId == request.auth.uid;
+    }
+
+    // ---------- أرقام التواصل ----------
+    // رقم المالك يراه المسجلون المؤكدون فقط (ليس الزوار)، ويكتبه صاحب العقار فقط
+    match /propertyContacts/{propertyId} {
+      allow read: if signedIn() && verified();
+
+      allow create, update: if signedIn() && verified()
+        && request.resource.data.keys().hasOnly(['ownerId', 'phone'])
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() <= 20
+        && getAfter(/databases/$(database)/documents/properties/$(propertyId)).data.ownerId == request.auth.uid;
 
       allow delete: if signedIn() && verified()
         && resource.data.ownerId == request.auth.uid;
