@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { isValidPhone } from "../../utils/phone.js";
 import { compressImageFile, dataUrlBytes } from "../../utils/imageCompress.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import { 
@@ -65,6 +66,16 @@ const INITIAL_FORM = {
   latitude: null,
   longitude: null,
   amenities: [],
+  contactPhone: "",
+};
+
+// رقم هاتف المستخدم من ملفه الشخصي (للتعبئة المبدئية)
+const getProfilePhone = () => {
+  try {
+    return JSON.parse(localStorage.getItem("baytakUser"))?.phone || "";
+  } catch {
+    return "";
+  }
 };
 
 const TEXT = {
@@ -250,12 +261,13 @@ export default function AddProperty() {
     try {
       const saved = sessionStorage.getItem(FORM_STORAGE_KEY);
       if (saved) {
-        return JSON.parse(saved);
+        const draft = JSON.parse(saved);
+        return { ...draft, contactPhone: draft.contactPhone ?? getProfilePhone() };
       }
     } catch {
       // ignore
     }
-    return INITIAL_FORM;
+    return { ...INITIAL_FORM, contactPhone: getProfilePhone() };
   });
 
   const [errors, setErrors] = useState({});
@@ -412,6 +424,7 @@ export default function AddProperty() {
     if (formData.area === "" || !Number.isFinite(area) || area <= 0) nextErrors.area = t.invalidArea;
     if (!formData.governorate || !formData.city || !formData.location.trim()) nextErrors.location = t.locationRequired;
     if (formData.images.length === 0) nextErrors.images = t.imagesRequired;
+    if (!isValidPhone(formData.contactPhone)) nextErrors.contactPhone = "اكتب رقم هاتف صحيح للتواصل (10 إلى 15 رقم).";
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }
@@ -460,6 +473,7 @@ export default function AddProperty() {
         latitude: formData.latitude == null ? null : Number(formData.latitude),
         longitude: formData.longitude == null ? null : Number(formData.longitude),
         amenities: [...formData.amenities],
+        contactPhone: formData.contactPhone.trim(),
         createdAt: now,
         updatedAt: now,
       };
@@ -540,6 +554,12 @@ export default function AddProperty() {
                 <label htmlFor="property-price">{t.price} <span className="required">*</span></label>
                 <input id="property-price" type="number" min="1" step="any" inputMode="decimal" value={formData.price} onChange={(event) => updateField("price", event.target.value)} placeholder={t.pricePlaceholder} aria-invalid={Boolean(errors.price)} />
                 {renderError("price")}
+              </div>
+              <div className="form-group">
+                <label htmlFor="property-contact-phone">رقم التواصل <span className="required">*</span></label>
+                <input id="property-contact-phone" type="tel" inputMode="tel" dir="ltr" value={formData.contactPhone || ""} onChange={(event) => updateField("contactPhone", event.target.value)} placeholder="01XXXXXXXXX" aria-invalid={Boolean(errors.contactPhone)} />
+                <small>يظهر للمستخدمين المسجلين فقط (اتصال وواتساب)</small>
+                {renderError("contactPhone")}
               </div>
               <div className="form-group">
                 <label htmlFor="property-type">{t.type}</label>

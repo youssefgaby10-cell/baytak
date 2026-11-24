@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { compressImageFile } from "../../utils/imageCompress.js";
 import { useLocation, useNavigate } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
+import { isValidPhone } from "../../utils/phone.js";
 import { useProperties } from "../../context/PropertyContext";
 
 import {
@@ -70,7 +73,28 @@ function EditProperty() {
     description: property.description || "",
     latitude: property.latitude ?? "",
     longitude: property.longitude ?? "",
+    contactPhone: (() => {
+      try {
+        return JSON.parse(localStorage.getItem("baytakUser"))?.phone || "";
+      } catch {
+        return "";
+      }
+    })(),
   });
+
+  // رقم التواصل المحفوظ للعقار (لو موجود يحل محل رقم الملف الشخصي)
+  useEffect(() => {
+    if (!property?.id) return;
+
+    getDoc(doc(db, "propertyContacts", String(property.id)))
+      .then((snapshot) => {
+        const savedPhone = snapshot.exists() ? snapshot.data().phone : "";
+        if (savedPhone) {
+          setFormData((previous) => ({ ...previous, contactPhone: savedPhone }));
+        }
+      })
+      .catch(() => {});
+  }, [property?.id]);
 
   // التعامل مع العودة من صفحة الخريطة في التعديل لتحديث الإحداثيات دون فقدان البيانات
   useEffect(() => {
@@ -349,6 +373,10 @@ function EditProperty() {
       newErrors.price = "اكتب السعر";
     }
 
+    if (!isValidPhone(formData.contactPhone)) {
+      newErrors.contactPhone = "اكتب رقم هاتف صحيح للتواصل (10 إلى 15 رقم)";
+    }
+
     if (!formData.governorate) {
       newErrors.governorate = "اختار المحافظة";
     }
@@ -388,6 +416,8 @@ function EditProperty() {
 
     const updatedProperty = {
       ...property,
+
+      contactPhone: formData.contactPhone.trim(),
 
       title: formData.title.trim(),
 
@@ -722,6 +752,26 @@ function EditProperty() {
                 {errors.price && (
                   <span className="field-error">
                     {errors.price}
+                  </span>
+                )}
+              </div>
+
+              <div className="form-group">
+                <label>رقم التواصل (يظهر للمسجلين فقط)</label>
+
+                <input
+                  name="contactPhone"
+                  type="tel"
+                  inputMode="tel"
+                  dir="ltr"
+                  value={formData.contactPhone}
+                  onChange={handleChange}
+                  placeholder="01XXXXXXXXX"
+                />
+
+                {errors.contactPhone && (
+                  <span className="field-error">
+                    {errors.contactPhone}
                   </span>
                 )}
               </div>

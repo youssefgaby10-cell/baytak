@@ -188,6 +188,11 @@ export function PropertyProvider({ children }) {
       const user = getCurrentUser();
       const propertyWithoutId = { ...newProperty };
       delete propertyWithoutId.id; // معرف العقار هو معرف مستند Firestore
+      delete propertyWithoutId.views; // العدّاد يديره النظام فقط
+      delete propertyWithoutId.contactPhone; // رقم التواصل يُحفظ منفصلاً (للمسجلين فقط)
+      const contactPhone = String(
+        newProperty.contactPhone || user?.phone || ""
+      ).trim();
       const propertyData = {
         ...propertyWithoutId,
         ownerId: getUserId(user),
@@ -203,11 +208,11 @@ export function PropertyProvider({ children }) {
       await setDoc(propertyRef, propertyData);
 
       // رقم التواصل منفصل (يراه المسجلون فقط). لو فشل لا يمنع حفظ العقار
-      if (user?.phone) {
+      if (contactPhone) {
         try {
           await setDoc(doc(db, "propertyContacts", propertyRef.id), {
             ownerId,
-            phone: String(user.phone),
+            phone: contactPhone,
           });
         } catch (contactError) {
           console.error("تعذر حفظ رقم التواصل:", contactError);
@@ -228,16 +233,22 @@ export function PropertyProvider({ children }) {
       
       const cleanData = { ...updatedProperty };
       delete cleanData.id; // لا نحفظ الـ id داخل الحقول
+      delete cleanData.views; // لا نرجّع عدّاد المشاهدات لقيمة قديمة
+      delete cleanData.contactPhone; // يُحفظ منفصلاً (للمسجلين فقط)
 
       await updateDoc(propertyRef, cleanData);
 
       // تحديث رقم التواصل من ملف المالك (لا يوقف الحفظ لو فشل)
       try {
         const user = getCurrentUser();
-        if (user?.phone && authUid) {
+        const phone = String(
+          updatedProperty.contactPhone || user?.phone || ""
+        ).trim();
+
+        if (phone && authUid) {
           await setDoc(
             doc(db, "propertyContacts", String(updatedProperty.id)),
-            { ownerId: authUid, phone: String(user.phone) }
+            { ownerId: authUid, phone }
           );
         }
       } catch (contactError) {
