@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { db } from "../firebase/firebase";
+import { auth, db } from "../firebase/firebase";
 import { useAuth } from "./AuthContext";
 import {
   collection,
@@ -358,6 +358,27 @@ export function PropertyProvider({ children }) {
 
   // ===== طلبات المعاينة (Firestore) =====
 
+  // إرسال إشعار موبايل بعد إنشاء إشعار داخل الموقع (لا يوقف أي شيء لو فشل)
+  const sendPush = (notificationId) => {
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) return;
+
+    currentUser
+      .getIdToken()
+      .then((token) =>
+        fetch("/api/send-push", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ notificationId }),
+        })
+      )
+      .catch(() => {});
+  };
+
   const buildNotification = ({ userId, type, requestId, request, actorName }) => ({
     userId,
     fromUserId: authUid,
@@ -487,6 +508,8 @@ export function PropertyProvider({ children }) {
 
       await batch.commit();
 
+      sendPush(notificationRef.id);
+
       return {
         success: true,
         message: "تم إرسال طلب المعاينة بنجاح.",
@@ -554,8 +577,10 @@ export function PropertyProvider({ children }) {
         updatedAt: new Date().toISOString(),
       });
 
+      const notificationRef = doc(collection(db, "notifications"));
+
       batch.set(
-        doc(collection(db, "notifications")),
+        notificationRef,
         buildNotification({
           userId: String(request.tenantId),
           type: status === "accepted" ? "viewing_accepted" : "viewing_rejected",
@@ -566,6 +591,8 @@ export function PropertyProvider({ children }) {
       );
 
       await batch.commit();
+
+      sendPush(notificationRef.id);
 
       return {
         success: true,
@@ -610,8 +637,10 @@ export function PropertyProvider({ children }) {
         updatedAt: new Date().toISOString(),
       });
 
+      const notificationRef = doc(collection(db, "notifications"));
+
       batch.set(
-        doc(collection(db, "notifications")),
+        notificationRef,
         buildNotification({
           userId: String(request.ownerId),
           type: "viewing_cancelled",
@@ -622,6 +651,8 @@ export function PropertyProvider({ children }) {
       );
 
       await batch.commit();
+
+      sendPush(notificationRef.id);
 
       return { success: true, message: "تم إلغاء طلب المعاينة." };
     } catch (error) {

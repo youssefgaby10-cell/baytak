@@ -334,6 +334,14 @@ export function AuthProvider({ children }) {
     busy.current = true;
 
     try {
+      // فصل هذا الجهاز عن إشعارات الحساب (قبل تسجيل الخروج لأنه يحتاج الجلسة)
+      try {
+        const { unregisterPushToken } = await import("../services/pushService.js");
+        await unregisterPushToken();
+      } catch {
+        // لا يمنع تسجيل الخروج
+      }
+
       await signOut(auth);
     } finally {
       busy.current = false;

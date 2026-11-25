@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaBell } from "react-icons/fa";
 import { useLanguage } from "../../context/LanguageContext";
 import { useProperties } from "../../context/PropertyContext";
+import PushCard from "../../components/common/PushCard";
 import "../../styles/Notifications.css";
 
 // صفحة الطلبات التي يفتحها كل نوع إشعار
@@ -112,6 +113,8 @@ function Notifications() {
           </button>
         )}
       </header>
+
+      <PushCard isArabic={isArabic} />
 
       {notifications.length === 0 ? (
         <section className="notifications-content">
