@@ -103,7 +103,8 @@ function PropertyDetails() {
       : {
           title: "عقار | Baytak",
           description: "تفاصيل العقار على Baytak",
-          noindex: true,
+          // لا نضع noindex أثناء التحميل (قد يلتقطه جوجل)، فقط لو العقار غير موجود فعلاً
+          noindex: !loading,
         }
   );
 

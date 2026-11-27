@@ -34,6 +34,7 @@ export function useSeo({
   image,
   noindex = false,
   type = "website",
+  canonicalPath,
 } = {}) {
   useEffect(() => {
     const undo = [];
@@ -41,7 +42,8 @@ export function useSeo({
 
     if (title) document.title = title;
 
-    const canonicalUrl = `${window.location.origin}${window.location.pathname}`;
+    // canonicalPath يوحّد الصفحات المكررة (مثل / و /home) على رابط واحد
+    const canonicalUrl = `${window.location.origin}${canonicalPath ?? window.location.pathname}`;
 
     undo.push(applyTag("meta", "name", "description", "content", description));
     undo.push(applyTag("link", "rel", "canonical", "href", canonicalUrl));
@@ -72,5 +74,5 @@ export function useSeo({
       document.title = previousTitle;
       undo.forEach((restore) => restore());
     };
-  }, [title, description, image, noindex, type]);
+  }, [title, description, image, noindex, type, canonicalPath]);
 }
