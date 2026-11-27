@@ -21,8 +21,8 @@ messaging.onBackgroundMessage((payload) => {
 
   self.registration.showNotification(data.title || "Baytak", {
     body: data.body || "",
-    icon: "/images/logo.png",
-    badge: "/images/logo.png",
+    icon: "/icons/icon-192.png",
+    badge: "/icons/badge-96.png",
     dir: "rtl",
     lang: "ar",
     tag: data.tag || undefined,
